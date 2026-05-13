@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Dashboard · SSOMA</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0d1117;--sf:#161b27;--sf2:#1c2333;--sf3:#212840;
+  --bd:rgba(255,255,255,0.06);--bd2:rgba(255,255,255,0.11);
+  --tx:#dde1ed;--tx2:#7b82a0;--tx3:#454d66;
+  --acc:#4f8ef7;--acc2:#7c4dff;
+  --grn:#2dd4a0;--grn2:rgba(45,212,160,0.12);
+  --red:#f26b6b;--red2:rgba(242,107,107,0.12);
+  --amb:#f5a52a;--amb2:rgba(245,165,42,0.12);
+  --blu2:rgba(79,142,247,0.12);--pur:#a78bfa;--pur2:rgba(167,139,250,0.12);
+  --ora:#fb923c;--ora2:rgba(251,146,60,0.12);
+  --tel:#2dd4a0;--tel2:rgba(45,212,160,0.12);
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--bd2);border-radius:3px}
+
+/* ── HEADER ── */
+.hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 24px;border-bottom:1px solid var(--bd);background:var(--sf);position:sticky;top:0;z-index:50;gap:12px;flex-wrap:wrap}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hlogo{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,#f5a52a,#f26b6b);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+.htitle{font-size:15px;font-weight:600}
+.hsub{font-size:11px;color:var(--tx2)}
+.hdr-right{display:flex;align-items:center;gap:8px}
+.spill{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--tx2);background:var(--sf2);border:1px solid var(--bd);padding:4px 11px;border-radius:20px}
+.sdot{width:6px;height:6px;border-radius:50%}
+.sdot.ok{background:var(--grn);animation:pulse 2s infinite}
+.sdot.warn{background:var(--amb)}
+.sdot.danger{background:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.period{display:inline-flex;align-items:center;gap:6px;background:var(--sf2);border:1px solid var(--bd2);border-radius:20px;padding:5px 14px;font-size:12px;color:var(--tx2)}
+.period strong{color:var(--tx);font-weight:500}
+.fsel{background:var(--sf2);border:1px solid var(--bd2);border-radius:8px;padding:6px 12px;color:var(--tx);font-family:var(--font);font-size:13px;outline:none;cursor:pointer}
+.fsel:focus{border-color:var(--acc)}
+
+/* ── MAIN ── */
+.main{padding:20px 24px;max-width:100%;margin:0 auto;width:100%}
+
+/* ── KPI ROW ── */
+.krow{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.kpi{background:var(--sf);border:1px solid var(--bd);border-radius:12px;padding:14px 16px;position:relative;overflow:hidden;transition:border-color .2s}
+.kpi:hover{border-color:var(--bd2)}
+.kpi::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;border-radius:2px 2px 0 0}
+.kpi.kb::after{background:var(--acc)}
+.kpi.kg::after{background:var(--grn)}
+.kpi.kr::after{background:var(--red)}
+.kpi.ka::after{background:var(--amb)}
+.kpi.kp::after{background:var(--pur)}
+.kpi.ko::after{background:var(--ora)}
+.klbl{font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.kval{font-size:24px;font-weight:600;font-family:var(--mono);line-height:1;margin-bottom:3px}
+.kmeta{font-size:10px;color:var(--tx2)}
+
+/* ── ACCORDION ── */
+.accordion{margin-bottom:10px;border:1px solid var(--bd);border-radius:14px;overflow:hidden;transition:border-color .2s}
+.accordion.open{border-color:var(--bd2)}
+.acc-header{display:flex;align-items:center;gap:12px;padding:14px 18px;cursor:pointer;background:var(--sf);user-select:none;transition:background .15s}
+.acc-header:hover{background:var(--sf2)}
+.acc-icon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.acc-info{flex:1;min-width:0}
+.acc-title{font-size:14px;font-weight:600}
+.acc-sub{font-size:11px;color:var(--tx2);margin-top:2px}
+.acc-pills{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.pill.green{background:var(--grn2);color:var(--grn)}
+.pill.red{background:var(--red2);color:var(--red)}
+.pill.amber{background:var(--amb2);color:var(--amb)}
+.pill.blue{background:var(--blu2);color:var(--acc)}
+.pill.purple{background:var(--pur2);color:var(--pur)}
+.pill.orange{background:var(--ora2);color:var(--ora)}
+.acc-chevron{font-size:13px;color:var(--tx3);transition:transform .25s;flex-shrink:0}
+.accordion.open .acc-chevron{transform:rotate(180deg)}
+.acc-body{display:none;padding:0 18px 18px;background:var(--sf)}
+.accordion.open .acc-body{display:block}
+
+/* ── CHART GRID 3 COLS ── */
+.cg3{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.card{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;padding:16px 18px}
+.ct{font-size:13px;font-weight:500;margin-bottom:2px}
+.cs{font-size:11px;color:var(--tx3);margin-bottom:12px}
+.unit-lbl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.08em;padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:8px}
+.ul-casma{background:rgba(79,142,247,0.15);color:#4f8ef7}
+.ul-beneficio{background:rgba(45,212,160,0.15);color:#2dd4a0}
+.ul-onoaga{background:rgba(167,139,250,0.15);color:#a78bfa}
+
+/* ── ACC FILTERS ── */
+.acc-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;padding:12px 0 12px;border-bottom:1px solid var(--bd)}
+.filter-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;border-radius:20px;font-size:11px;font-weight:500;cursor:pointer;border:1px solid var(--bd2);background:transparent;color:var(--tx2);font-family:var(--font);transition:all .15s}
+.filter-chip:hover{border-color:var(--bd2);color:var(--tx)}
+.filter-chip.active{background:var(--sf3);border-color:var(--bd2);color:var(--tx)}
+.filter-label{font-size:11px;color:var(--tx3);align-self:center;white-space:nowrap}
+.acc-subtabs{display:flex;gap:3px;background:var(--sf3);border-radius:20px;padding:3px;margin-bottom:14px;width:fit-content}
+.stab{padding:5px 14px;border-radius:16px;font-size:11px;font-weight:500;cursor:pointer;border:none;color:var(--tx2);background:transparent;transition:all .15s;font-family:var(--font)}
+.stab.active{background:var(--sf);color:var(--tx);border:1px solid var(--bd2)}
+
+/* ── IDS TABLE ── */
+.ids-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.ids-card{background:var(--sf2);border:1px solid var(--bd);border-radius:12px;overflow:hidden}
+.ids-card-head{padding:12px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:8px}
+.ids-table{width:100%;border-collapse:collapse;font-size:12px}
+.ids-table thead th{background:var(--sf3);padding:7px 12px;text-align:left;font-size:10px;font-weight:500;color:var(--tx2);text-transform:uppercase;letter-spacing:.05em}
+.ids-table tbody td{padding:7px 12px;border-bottom:1px solid var(--bd)}
+.ids-table tbody tr:last-child td{border-bottom:none}
+.ids-table tbody tr:hover{background:rgba(255,255,255,0.02)}
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:500}
+.bg{background:var(--grn2);color:var(--grn)}
+.br{background:var(--red2);color:var(--red)}
+.ba{background:var(--amb2);color:var(--amb)}
+.bb{background:var(--blu2);color:var(--acc)}
+
+/* ── PROGRESS BAR ── */
+.prog-wrap{margin:6px 0 10px}
+.prog-row{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.prog-lbl{font-size:11px;color:var(--tx2);width:130px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog-bar-bg{flex:1;height:6px;background:rgba(255,255,255,0.06);border-radius:3px;overflow:hidden}
+.prog-bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+.prog-pct{font-size:11px;font-family:var(--mono);color:var(--tx2);width:36px;text-align:right;flex-shrink:0}
+
+/* ── SECTION HEADING ── */
+.sec{display:flex;align-items:center;gap:12px;margin:0 0 14px}
+.sec-ico{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.sec-title{font-size:15px;font-weight:600}
+.sec-sub{font-size:11px;color:var(--tx2);margin-top:1px}
+.sec-line{flex:1;height:1px;background:var(--bd)}
+
+/* ── TOP FILTERS ── */
+.top-bar{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:18px}
+.fl{font-size:12px;color:var(--tx2)}
+
+@media(max-width:900px){.cg3,.ids-grid{grid-template-columns:1fr}}
+@media(max-width:600px){.main,.hdr{padding-left:14px;padding-right:14px}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="hdr-left">
+    <div class="hlogo">⛑️</div>
+    <div>
+      <div class="htitle">Dashboard · SSOMA</div>
+      <div class="hsub">Seguridad, Salud Ocupacional y Medio Ambiente</div>
+    </div>
+  </div>
+  <div class="hdr-right">
+    <div class="spill"><span class="sdot ok" id="load-dot"></span><span id="slbl">Actualizado hoy</span></div>
+  </div>
+</header>
+
+<!-- MAIN -->
+<div class="main">
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="period"><span class="sdot ok"></span>Período: <strong id="periodo-lbl">Cargando...</strong></div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span class="fl">Año:</span>
+      <select class="fsel" id="sel-anio" onchange="renderAll()">
+        <option value="2026" selected>2026</option>
+        <option value="2025">2025</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- ══ KPIs GENERALES ══ -->
+  <div class="sec">
+    <div class="sec-ico" style="background:var(--red2)">📊</div>
+    <div><div class="sec-title">Resumen General</div><div class="sec-sub">Indicadores consolidados de todas las unidades</div></div>
+    <div class="sec-line"></div>
+  </div>
+  <div class="krow" id="kpi-general"></div>
+
+  <!-- ══ ACCORDION 1: HORAS HOMBRE ══ -->
+  <div class="accordion" id="acc-hh">
+    <div class="acc-header" onclick="toggleAcc('acc-hh')">
+      <div class="acc-icon" style="background:var(--blu2)">⏱️</div>
+      <div class="acc-info">
+        <div class="acc-title">1. Horas Hombre</div>
+        <div class="acc-sub">Horas trabajadas y horas perdidas por unidad</div>
+      </div>
+      <div class="acc-pills" id="pills-hh"></div>
+      <div class="acc-chevron">▼</div>
+    </div>
+    <div class="acc-body">
+      <div id="charts-hh"></div>
+    </div>
+  </div>
+
+  <!-- ══ ACCORDION 2: TIPOS DE ACCIDENTE ══ -->
+  <div class="accordion" id="acc-acc">
+    <div class="acc-header" onclick="toggleAcc('acc-acc')">
+      <div class="acc-icon" style="background:var(--red2)">🚨</div>
+      <div class="acc-info">
+        <div class="acc-title">2. Tipos de Accidente</div>
+        <div class="acc-sub">Leve, incapacitante y mortal por unidad</div>
+      </div>
+      <div class="acc-pills" id="pills-acc"></div>
+      <div class="acc-chevron">▼</div>
+    </div>
+    <div class="acc-body">
+      <div id="charts-acc"></div>
+    </div>
+  </div>
+
+  <!-- ══ ACCORDION 3: IDS ══ -->
+  <div class="accordion" id="acc-ids">
+    <div class="acc-header" onclick="toggleAcc('acc-ids')">
+      <div class="acc-icon" style="background:var(--grn2)">📋</div>
+      <div class="acc-info">
+        <div class="acc-title">3. Estado del IDS</div>
+        <div class="acc-sub">Inspecciones diarias de seguridad — actualización diaria</div>
+      </div>
+      <div class="acc-pills" id="pills-ids"></div>
+      <div class="acc-chevron">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="ids-grid" id="charts-ids"></div>
+    </div>
+  </div>
+
+  <!-- ══ ACCORDION 4: CAPACITACIONES ══ -->
+  <div class="accordion" id="acc-cap">
+    <div class="acc-header" onclick="toggleAcc('acc-cap')">
+      <div class="acc-icon" style="background:var(--pur2)">🎓</div>
+      <div class="acc-info">
+        <div class="acc-title">4. Cumplimiento de Capacitaciones</div>
+        <div class="acc-sub">Porcentaje de cumplimiento al programa de capacitaciones</div>
+      </div>
+      <div class="acc-pills" id="pills-cap"></div>
+      <div class="acc-chevron">▼</div>
+    </div>
+    <div class="acc-body">
+      <div class="cg3" id="charts-cap"></div>
+    </div>
+  </div>
+
+  <!-- ══ ACCORDION 5: SISTEMA DE GESTIÓN ══ -->
+  <div class="accordion" id="acc-sg">
+    <div class="acc-header" onclick="toggleAcc('acc-sg')">
+      <div class="acc-icon" style="background:var(--amb2)">🛡️</div>
+      <div class="acc-info">
+        <div class="acc-title">5. Implementación del Sistema de Gestión</div>
+        <div class="acc-sub">% de avance en implementación del SGSSO por unidad</div>
+      </div>
+      <div class="acc-pills" id="pills-sg"></div>
+      <div class="acc-chevron">▼</div>
+    </div>
+    <div class="acc-body">
+      <div id="charts-sg"></div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+/* ══════════════════════════════════════
+   DATOS DE MUESTRA
+══════════════════════════════════════ */
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const UNIDADES = [
+  {id:'casma',   label:'Minera Casma',    cls:'ul-casma',    color:'#4f8ef7'},
+  {id:'beneficio',label:'Planta Beneficio',cls:'ul-beneficio',color:'#2dd4a0'},
+];
+
+const DATA = {
+  2025: {
+    hh: {
+      casma:     {trabajadas:[18200,17800,19000,18500,0,0,0,0,0,0,0,0], perdidas:[320,290,310,280,0,0,0,0,0,0,0,0]},
+      beneficio: {trabajadas:[9800,9600,10200,9900,0,0,0,0,0,0,0,0],  perdidas:[120,100,140,110,0,0,0,0,0,0,0,0]},
+        },
+    accidentes: {
+      casma:     [{mes:'Ene',leve:2,incap:1,mortal:0},{mes:'Feb',leve:1,incap:0,mortal:0},{mes:'Mar',leve:3,incap:1,mortal:0},{mes:'Abr',leve:2,incap:0,mortal:0}],
+      beneficio: [{mes:'Ene',leve:0,incap:0,mortal:0},{mes:'Feb',leve:1,incap:0,mortal:0},{mes:'Mar',leve:1,incap:1,mortal:0},{mes:'Abr',leve:0,incap:0,mortal:0}],
+        },
+    ids: {
+      casma: [
+        {item:'Orden y limpieza área A',estado:'Conforme',fecha:'24/04'},
+        {item:'EPP operadores turno día',estado:'Conforme',fecha:'24/04'},
+        {item:'Señalización vía principal',estado:'Observado',fecha:'24/04'},
+        {item:'Extintores zona explosivos',estado:'Conforme',fecha:'23/04'},
+        {item:'Bloqueo y etiquetado',estado:'No conforme',fecha:'23/04'},
+        {item:'Iluminación galería sur',estado:'Conforme',fecha:'22/04'},
+      ],
+      beneficio: [
+        {item:'Orden y limpieza planta',estado:'Conforme',fecha:'24/04'},
+        {item:'EPP operadores flotación',estado:'Conforme',fecha:'24/04'},
+        {item:'Protección maquinaria',estado:'Conforme',fecha:'24/04'},
+        {item:'Manejo de reactivos',estado:'Observado',fecha:'23/04'},
+        {item:'Ventilación área cianuración',estado:'Conforme',fecha:'23/04'},
+        {item:'Duchas lavaojos',estado:'Conforme',fecha:'22/04'},
+      ],
+    },
+    capacitaciones: {
+      casma: [
+        {tema:'Manejo defensivo',prog:20,ejec:20},
+        {tema:'Trabajos en altura',prog:15,ejec:12},
+        {tema:'Espacios confinados',prog:10,ejec:10},
+        {tema:'Primeros auxilios',prog:8,ejec:6},
+        {tema:'MATPEL',prog:12,ejec:12},
+        {tema:'Plan de emergencias',prog:10,ejec:8},
+      ],
+      beneficio: [
+        {tema:'Manejo defensivo',prog:10,ejec:10},
+        {tema:'Riesgo químico',prog:12,ejec:10},
+        {tema:'Ergonomía',prog:8,ejec:8},
+        {tema:'Primeros auxilios',prog:6,ejec:5},
+        {tema:'Plan de emergencias',prog:8,ejec:7},
+        {tema:'Bloqueo y etiquetado',prog:10,ejec:9},
+      ],
+    },
+    sgsso: {
+      casma: [
+        {elemento:'Política de SSO',avance:100},
+        {elemento:'Identificación de peligros (IPER)',avance:85},
+        {elemento:'Procedimientos de trabajo',avance:72},
+        {elemento:'Programa de capacitación',avance:80},
+        {elemento:'Inspecciones de seguridad',avance:90},
+        {elemento:'Investigación de accidentes',avance:75},
+        {elemento:'Auditorías internas',avance:60},
+        {elemento:'Revisión por la dirección',avance:50},
+      ],
+      beneficio: [
+        {elemento:'Política de SSO',avance:100},
+        {elemento:'Identificación de peligros (IPER)',avance:78},
+        {elemento:'Procedimientos de trabajo',avance:65},
+        {elemento:'Programa de capacitación',avance:74},
+        {elemento:'Inspecciones de seguridad',avance:88},
+        {elemento:'Investigación de accidentes',avance:70},
+        {elemento:'Auditorías internas',avance:45},
+        {elemento:'Revisión por la dirección',avance:40},
+      ],
+    },
+  },
+  2024: {
+    hh: {
+      casma:     {trabajadas:[17000,16800,17500,17200,17800,18000,17600,17400,18100,17900,16500,16000], perdidas:[350,310,340,300,280,260,310,290,330,290,380,420]},
+      beneficio: {trabajadas:[9200,9100,9400,9300,9500,9600,9400,9200,9700,9500,9000,8800], perdidas:[130,110,125,115,105,100,115,108,122,110,135,160]},
+        },
+    accidentes: {
+      casma:     [{mes:'Ene',leve:3,incap:1,mortal:0},{mes:'Feb',leve:2,incap:2,mortal:0},{mes:'Mar',leve:4,incap:1,mortal:0},{mes:'Abr',leve:2,incap:1,mortal:0},{mes:'May',leve:1,incap:0,mortal:0},{mes:'Jun',leve:3,incap:1,mortal:0},{mes:'Jul',leve:2,incap:0,mortal:0},{mes:'Ago',leve:1,incap:1,mortal:0},{mes:'Sep',leve:2,incap:0,mortal:0},{mes:'Oct',leve:3,incap:1,mortal:0},{mes:'Nov',leve:2,incap:0,mortal:0},{mes:'Dic',leve:1,incap:1,mortal:0}],
+      beneficio: [{mes:'Ene',leve:1,incap:0,mortal:0},{mes:'Feb',leve:0,incap:1,mortal:0},{mes:'Mar',leve:2,incap:0,mortal:0},{mes:'Abr',leve:1,incap:0,mortal:0},{mes:'May',leve:0,incap:0,mortal:0},{mes:'Jun',leve:1,incap:1,mortal:0},{mes:'Jul',leve:0,incap:0,mortal:0},{mes:'Ago',leve:2,incap:0,mortal:0},{mes:'Sep',leve:1,incap:0,mortal:0},{mes:'Oct',leve:0,incap:1,mortal:0},{mes:'Nov',leve:1,incap:0,mortal:0},{mes:'Dic',leve:0,incap:0,mortal:0}],
+    },
+    ids: {
+      casma: [
+        {item:'Orden y limpieza área A',estado:'Conforme',fecha:'31/12'},
+        {item:'EPP operadores',estado:'Observado',fecha:'31/12'},
+        {item:'Señalización',estado:'Conforme',fecha:'30/12'},
+        {item:'Extintores',estado:'Conforme',fecha:'30/12'},
+        {item:'Bloqueo y etiquetado',estado:'Conforme',fecha:'29/12'},
+      ],
+      beneficio: [
+        {item:'Orden y limpieza planta',estado:'Conforme',fecha:'31/12'},
+        {item:'EPP operadores',estado:'Conforme',fecha:'31/12'},
+        {item:'Manejo de reactivos',estado:'No conforme',fecha:'30/12'},
+        {item:'Ventilación',estado:'Conforme',fecha:'30/12'},
+      ],
+    },
+    capacitaciones: {
+      casma: [
+        {tema:'Manejo defensivo',prog:20,ejec:18},
+        {tema:'Trabajos en altura',prog:15,ejec:14},
+        {tema:'Espacios confinados',prog:10,ejec:9},
+        {tema:'Primeros auxilios',prog:8,ejec:8},
+        {tema:'MATPEL',prog:12,ejec:11},
+        {tema:'Plan de emergencias',prog:10,ejec:9},
+      ],
+      beneficio: [
+        {tema:'Manejo defensivo',prog:10,ejec:9},
+        {tema:'Riesgo químico',prog:12,ejec:11},
+        {tema:'Ergonomía',prog:8,ejec:7},
+        {tema:'Primeros auxilios',prog:6,ejec:6},
+        {tema:'Plan de emergencias',prog:8,ejec:8},
+        {tema:'Bloqueo y etiquetado',prog:10,ejec:8},
+      ],
+    },
+    sgsso: {
+      casma: [
+        {elemento:'Política de SSO',avance:100},
+        {elemento:'Identificación de peligros (IPER)',avance:75},
+        {elemento:'Procedimientos de trabajo',avance:62},
+        {elemento:'Programa de capacitación',avance:70},
+        {elemento:'Inspecciones de seguridad',avance:82},
+        {elemento:'Investigación de accidentes',avance:65},
+        {elemento:'Auditorías internas',avance:50},
+        {elemento:'Revisión por la dirección',avance:40},
+      ],
+      beneficio: [
+        {elemento:'Política de SSO',avance:100},
+        {elemento:'Identificación de peligros (IPER)',avance:68},
+        {elemento:'Procedimientos de trabajo',avance:55},
+        {elemento:'Programa de capacitación',avance:64},
+        {elemento:'Inspecciones de seguridad',avance:78},
+        {elemento:'Investigación de accidentes',avance:60},
+        {elemento:'Auditorías internas',avance:35},
+        {elemento:'Revisión por la dirección',avance:30},
+      ],
+    },
+  }
+};
+
+let chartRegistry = {};
+
+function destroyChart(id){if(chartRegistry[id]){chartRegistry[id].destroy();delete chartRegistry[id];}}
+
+function getAnio(){
+  const v = parseInt(document.getElementById('sel-anio').value)||2026;
+  // For sections still using mock DATA object, fall back to 2025 if year not present
+  return v;
+}
+function getDataAnio(){
+  const v = getAnio();
+  return DATA[v] ? v : (DATA[2025] ? 2025 : Object.keys(DATA)[0]);
+}
+
+function toggleAcc(id){
+  const el=document.getElementById(id);
+  if(!el) return;
+  const wasOpen=el.classList.contains('open');
+  el.classList.toggle('open');
+  if(!wasOpen){
+    try { renderAccordion(id); } catch(e){ console.warn('renderAccordion '+id+':', e); }
+  }
+}
+
+function progColor(p){
+  if(p>=85) return '#2dd4a0';
+  if(p>=60) return '#f5a52a';
+  return '#f26b6b';
+}
+
+function pillColor(p){
+  if(p>=85) return 'green';
+  if(p>=60) return 'amber';
+  return 'red';
+}
+
+/* ── PERIODO LABEL ── */
+function updatePeriodLabel(){
+  const anio = getAnio();
+  const MES_NOM_P = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  // Determine last month with data for selected year across all datasets
+  let lastMes = 0;
+  // Check HH fallback data (always available)
+  const hhFallback = (typeof HH_CASMA_FALLBACK!=='undefined' ? HH_CASMA_FALLBACK : [])
+    .concat(typeof HH_PLANTA_FALLBACK!=='undefined' ? HH_PLANTA_FALLBACK : []);
+  const hhFallbackRows = hhFallback.filter(r=>parseInt(r['AÑO']||r.anio||0)===anio);
+  if(hhFallbackRows.length) lastMes = Math.max(...hhFallbackRows.map(r=>parseInt(r['MESES']||r.mes||0)));
+  // Also check loaded HH_DATA
+  const hhRows = Object.values(HH_DATA).flat().filter(r=>r && r.anio===anio);
+  if(hhRows.length) lastMes = Math.max(lastMes, Math.max(...hhRows.map(r=>r.mes)));
+  // Check IDS data
+  const idsRows = Object.values(IDS_DATA).flat().filter(r=>r && r.anio===anio);
+  if(idsRows.length) lastMes = Math.max(lastMes, Math.max(...idsRows.map(r=>r.mes)));
+  // Fallback: current month
+  if(!lastMes) lastMes = new Date().getMonth()+1;
+  const lbl = document.getElementById('periodo-lbl');
+  if(lbl) lbl.textContent = lastMes > 1
+    ? `Ene – ${MES_NOM_P[lastMes]} ${anio}`
+    : `${MES_NOM_P[lastMes]} ${anio}`;
+}
+
+/* ── KPIs GENERALES ── */
+function renderKPIs(){
+  const anio = getAnio();
+
+  // HH totales desde datos reales
+  let totalHH=0;
+  Object.values(HH_DATA).forEach(rows=>{
+    if(!rows) return;
+    rows.filter(r=>r.anio===anio).forEach(r=>totalHH+=r.hh);
+  });
+
+  // Accidentes desde CASMA_RAW_FALLBACK (datos reales de accidentes)
+  const accRows = typeof CASMA_RAW_FALLBACK !== 'undefined' ? CASMA_RAW_FALLBACK : [];
+  const leve   = accRows.reduce((s,r)=>s+(+r.leve||0),0);
+  const incap  = accRows.reduce((s,r)=>s+(+r.incap||0),0);
+  const mortal = accRows.reduce((s,r)=>s+(+r.mortal||0),0);
+
+  // IF desde HH Casma último mes del año
+  let ifr = 0;
+  if(HH_DATA.casma){
+    const rowsAnio = HH_DATA.casma.filter(r=>r.anio===anio);
+    if(rowsAnio.length){
+      const last = rowsAnio[rowsAnio.length-1];
+      ifr = parseFloat(last.IF||0).toFixed(2);
+    }
+  }
+
+  // IDS cumplimiento global
+  const allIDS = Object.values(IDS_DATA).flat().filter(Boolean);
+  const idsProg = allIDS.reduce((s,r)=>s+r.programado,0);
+  const idsEjec = allIDS.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+  const idsPct  = idsProg>0?Math.round(idsEjec/idsProg*100):0;
+
+  const kpis=[
+    {cls:'kb', lbl:'HH Trabajadas',      val: totalHH>0?(totalHH/1000).toFixed(1)+'K':'–', meta:`Año ${anio}`},
+    {cls:'ka', lbl:'Accidentes Leves',   val: leve,   meta:'Eventos registrados'},
+    {cls:'kr', lbl:'Incapacitantes',     val: incap,  meta:'Con descanso médico'},
+    {cls:'kr', lbl:'Mortales',           val: mortal, meta:'Año en curso'},
+    {cls:'kb', lbl:'Índice de Frec.',    val: ifr,    meta:'Último mes'},
+    {cls:'kp', lbl:'Cumpl. IDS',         val: idsPct+'%', meta:'Todas las unidades'},
+  ];
+  document.getElementById('kpi-general').innerHTML=kpis.map(k=>`
+    <div class="kpi ${k.cls}">
+      <div class="klbl">${k.lbl}</div>
+      <div class="kval">${k.val}</div>
+      <div class="kmeta">${k.meta}</div>
+    </div>`).join('');
+}
+
+/* ══════════════════════════════════════
+   HORAS HOMBRE — carga desde GitHub
+══════════════════════════════════════ */
+const HH_CASMA_FALLBACK = [{"AÑO": "2025", "MESES": "1", "Nº DE TRABAJADORES": "385", "HORAS TRABAJADAS": "73305.36", "INDICE DE FRECUENCIA": "13.6415672742075", "INDICE DE SEVERIDAD": "177.340374564698", "INDICE DE ACCIDENTABILIDAD": "2.41920065005748", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "1", "MORTAL": "0", "ACCIDENTES LEVES": "17", "DÍAS PERDIDOS": "13"}, {"AÑO": "2025", "MESES": "2", "Nº DE TRABAJADORES": "409", "HORAS TRABAJADAS": "74108.79", "INDICE DE FRECUENCIA": "13.4936759863439", "INDICE DE SEVERIDAD": "67.4683799317193", "INDICE DE ACCIDENTABILIDAD": "0.910396458122165", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "1", "MORTAL": "0", "ACCIDENTES LEVES": "4", "DÍAS PERDIDOS": "5"}, {"AÑO": "2025", "MESES": "3", "Nº DE TRABAJADORES": "467", "HORAS TRABAJADAS": "85063.88", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "5", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "4", "Nº DE TRABAJADORES": "475", "HORAS TRABAJADAS": "91946.97", "INDICE DE FRECUENCIA": "65.255005140463", "INDICE DE SEVERIDAD": "674.301719784785", "INDICE DE ACCIDENTABILIDAD": "44.0015621907792", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "6", "MORTAL": "0", "ACCIDENTES LEVES": "8", "DÍAS PERDIDOS": "62"}, {"AÑO": "2025", "MESES": "5", "Nº DE TRABAJADORES": "461", "HORAS TRABAJADAS": "93441.96", "INDICE DE FRECUENCIA": "32.1054909379041", "INDICE DE SEVERIDAD": "663.513479383352", "INDICE DE ACCIDENTABILIDAD": "21.3024259995194", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "3", "MORTAL": "0", "ACCIDENTES LEVES": "7", "DÍAS PERDIDOS": "62"}, {"AÑO": "2025", "MESES": "6", "Nº DE TRABAJADORES": "483", "HORAS TRABAJADAS": "90797.76", "INDICE DE FRECUENCIA": "22.0269751148046", "INDICE DE SEVERIDAD": "352.431601836874", "INDICE DE ACCIDENTABILIDAD": "7.76300212333154", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "2", "MORTAL": "0", "ACCIDENTES LEVES": "5", "DÍAS PERDIDOS": "32"}, {"AÑO": "2025", "MESES": "7", "Nº DE TRABAJADORES": "529", "HORAS TRABAJADAS": "96950.48", "INDICE DE FRECUENCIA": "20.629088169548", "INDICE DE SEVERIDAD": "61.887264508644", "INDICE DE ACCIDENTABILIDAD": "1.27667783612096", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "2", "MORTAL": "0", "ACCIDENTES LEVES": "5", "DÍAS PERDIDOS": "6"}, {"AÑO": "2025", "MESES": "8", "Nº DE TRABAJADORES": "518", "HORAS TRABAJADAS": "98659.17", "INDICE DE FRECUENCIA": "20.2718105169545", "INDICE DE SEVERIDAD": "172.310389394113", "INDICE DE ACCIDENTABILIDAD": "3.4930435639001", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "2", "MORTAL": "0", "ACCIDENTES LEVES": "7", "DÍAS PERDIDOS": "17"}, {"AÑO": "2025", "MESES": "9", "Nº DE TRABAJADORES": "536", "HORAS TRABAJADAS": "98018.46", "INDICE DE FRECUENCIA": "10.2021598788636", "INDICE DE SEVERIDAD": "71.4151191520454", "INDICE DE ACCIDENTABILIDAD": "0.728588463357264", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "1", "MORTAL": "0", "ACCIDENTES LEVES": "3", "DÍAS PERDIDOS": "7"}, {"AÑO": "2025", "MESES": "10", "Nº DE TRABAJADORES": "565", "HORAS TRABAJADAS": "103011.93", "INDICE DE FRECUENCIA": "9.70761347739044", "INDICE DE SEVERIDAD": "48.5380673869522", "INDICE DE ACCIDENTABILIDAD": "0.471188797132062", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "1", "MORTAL": "0", "ACCIDENTES LEVES": "10", "DÍAS PERDIDOS": "5"}, {"AÑO": "2025", "MESES": "11", "Nº DE TRABAJADORES": "558", "HORAS TRABAJADAS": "101659.32", "INDICE DE FRECUENCIA": "19.673552803619", "INDICE DE SEVERIDAD": "98.367764018095", "INDICE DE ACCIDENTABILIDAD": "1.93524339958392", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "2", "MORTAL": "0", "ACCIDENTES LEVES": "5", "DÍAS PERDIDOS": "10"}, {"AÑO": "2025", "MESES": "12", "Nº DE TRABAJADORES": "542", "HORAS TRABAJADAS": "96503.13", "INDICE DE FRECUENCIA": "20.724716390028", "INDICE DE SEVERIDAD": "414.494327800559", "INDICE DE ACCIDENTABILIDAD": "8.59027738894188", "META IF": "29.24", "META IS": "175.44", "META IA": "175.44", "INCAPACITANTES": "2", "MORTAL": "0", "ACCIDENTES LEVES": "3", "DÍAS PERDIDOS": "40"}, {"AÑO": "2026", "MESES": "1", "Nº DE TRABAJADORES": "543", "HORAS TRABAJADAS": "97764.21", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "20.26", "META IS": "175.44", "META IA": "4.41", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "2", "DÍAS PERDIDOS": "0"}, {"AÑO": "2026", "MESES": "2", "Nº DE TRABAJADORES": "546", "HORAS TRABAJADAS": "90075.69", "INDICE DE FRECUENCIA": "22.2035490374817", "INDICE DE SEVERIDAD": "310.849686524744", "INDICE DE ACCIDENTABILIDAD": "6.90196625803796", "META IF": "20.26", "META IS": "175.44", "META IA": "4.41", "INCAPACITANTES": "2", "MORTAL": "0", "ACCIDENTES LEVES": "3", "DÍAS PERDIDOS": "28"}, {"AÑO": "2026", "MESES": "3", "Nº DE TRABAJADORES": "576", "HORAS TRABAJADAS": "95058.99", "INDICE DE FRECUENCIA": "31.5593506726718", "INDICE DE SEVERIDAD": "326.113290284275", "INDICE DE ACCIDENTABILIDAD": "10.2919236871002", "META IF": "20.26", "META IS": "175.44", "META IA": "4.41", "INCAPACITANTES": "3", "MORTAL": "0", "ACCIDENTES LEVES": "2", "DÍAS PERDIDOS": "31"}, {"AÑO": "2026", "MESES": "4", "Nº DE TRABAJADORES": "583", "HORAS TRABAJADAS": "86841.63", "INDICE DE FRECUENCIA": "46.0608581391206", "INDICE DE SEVERIDAD": "299.395577904284", "INDICE DE ACCIDENTABILIDAD": "13.7904172413293", "META IF": "20.26", "META IS": "175.44", "META IA": "4.41", "INCAPACITANTES": "4", "MORTAL": "0", "ACCIDENTES LEVES": "3", "DÍAS PERDIDOS": "26"}];
+
+const HH_PLANTA_FALLBACK = [{"AÑO": "2025", "MESES": "1", "Nº DE TRABAJADORES": "188", "HORAS TRABAJADAS": "69936", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "2", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "2", "Nº DE TRABAJADORES": "194", "HORAS TRABAJADAS": "65184", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "4", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "3", "Nº DE TRABAJADORES": "197", "HORAS TRABAJADAS": "73284", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "3", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "4", "Nº DE TRABAJADORES": "194", "HORAS TRABAJADAS": "69840", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "2", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "5", "Nº DE TRABAJADORES": "189", "HORAS TRABAJADAS": "70308", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "1", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "6", "Nº DE TRABAJADORES": "186", "HORAS TRABAJADAS": "66960", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "1", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "7", "Nº DE TRABAJADORES": "187", "HORAS TRABAJADAS": "69564", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "0", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "8", "Nº DE TRABAJADORES": "188", "HORAS TRABAJADAS": "69936", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "2", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "9", "Nº DE TRABAJADORES": "189", "HORAS TRABAJADAS": "68040", "INDICE DE FRECUENCIA": "14.6972369194591", "INDICE DE SEVERIDAD": "117.577895355673", "INDICE DE ACCIDENTABILIDAD": "1.7280701845337", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "1", "MORTAL": "0", "ACCIDENTES LEVES": "1", "DÍAS PERDIDOS": "8"}, {"AÑO": "2025", "MESES": "10", "Nº DE TRABAJADORES": "191", "HORAS TRABAJADAS": "71052", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "0", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "11", "Nº DE TRABAJADORES": "188", "HORAS TRABAJADAS": "67680", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "1", "DÍAS PERDIDOS": "0"}, {"AÑO": "2025", "MESES": "12", "Nº DE TRABAJADORES": "179", "HORAS TRABAJADAS": "66588", "INDICE DE FRECUENCIA": "15.0177209106746", "INDICE DE SEVERIDAD": "150.177209106746", "INDICE DE ACCIDENTABILIDAD": "2.25531941350913", "META IF": "10", "META IS": "100", "META IA": "1", "INCAPACITANTES": "1", "MORTAL": "0", "ACCIDENTES LEVES": "1", "DÍAS PERDIDOS": "10"}, {"AÑO": "2026", "MESES": "1", "Nº DE TRABAJADORES": "188", "HORAS TRABAJADAS": "69936", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "7", "META IS": "70", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "1", "DÍAS PERDIDOS": "0"}, {"AÑO": "2026", "MESES": "2", "Nº DE TRABAJADORES": "189", "HORAS TRABAJADAS": "63504", "INDICE DE FRECUENCIA": "0", "INDICE DE SEVERIDAD": "0", "INDICE DE ACCIDENTABILIDAD": "0", "META IF": "7", "META IS": "70", "META IA": "1", "INCAPACITANTES": "0", "MORTAL": "0", "ACCIDENTES LEVES": "1", "DÍAS PERDIDOS": "0"}, {"AÑO": "2026", "MESES": "3", "Nº DE TRABAJADORES": "197", "HORAS TRABAJADAS": "73284", "INDICE DE FRECUENCIA": "13.6455433655368", "INDICE DE SEVERIDAD": "13.6455433655368", "INDICE DE ACCIDENTABILIDAD": "0.186200853740746", "META IF": "7", "META IS": "70", "META IA": "1", "INCAPACITANTES": "1", "MORTAL": "0", "ACCIDENTES LEVES": "0", "DÍAS PERDIDOS": "1"}];
+
+const HH_URLS = {
+  casma:     'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/HH_CASMA.json',
+  beneficio: 'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/HH_PLANTA.json',
+  // onoaga: pendiente
+};
+let HH_DATA = { casma: null, beneficio: null };
+
+// Índices disponibles con config de color y meta
+const HH_INDICES = [
+  { key:'IF', label:'Índice de Frecuencia',      campo:'INDICE DE FRECUENCIA',      meta:'META IF',  color:'#4f8ef7' },
+  { key:'IS', label:'Índice de Severidad',        campo:'INDICE DE SEVERIDAD',        meta:'META IS',  color:'#a78bfa' },
+  { key:'IA', label:'Índice de Accidentabilidad', campo:'INDICE DE ACCIDENTABILIDAD', meta:'META IA',  color:'#f5a52a' },
+];
+let hhFilters = { indices: ['IF','IS','IA'], anio: null }; // set after load
+
+// Busca un campo en un objeto ignorando saltos de línea y espacios extra
+function hhField(row, ...candidates){
+  for(const c of candidates){
+    if(row[c] !== undefined) return row[c];
+    const norm = c.replace(/\s+/g,' ').toLowerCase();
+    for(const k of Object.keys(row)){
+      if(k.replace(/\s+/g,' ').toLowerCase() === norm) return row[k];
+    }
+  }
+  return 0;
+}
+
+function parseHHRow(row){
+  return {
+    anio:         parseInt(hhField(row,'AÑO','anio') || 0),
+    mes:          parseInt(hhField(row,'MESES','mes','MES') || 0),
+    trabajadores: parseFloat(hhField(row,'Nº DE TRABAJADORES','TRABAJADORES') || 0),
+    hh:           parseFloat(hhField(row,'HORAS TRABAJADAS','HH') || 0),
+    IF:           parseFloat(hhField(row,'INDICE DE FRECUENCIA','IF') || 0),
+    IS:           parseFloat(hhField(row,'INDICE DE SEVERIDAD','IS') || 0),
+    IA:           parseFloat(hhField(row,'INDICE DE ACCIDENTABILIDAD','IA') || 0),
+    metaIF:       parseFloat(hhField(row,'META IF') || 0),
+    metaIS:       parseFloat(hhField(row,'META IS') || 0),
+    metaIA:       parseFloat(hhField(row,'META IA') || 0),
+    incap:        parseFloat(hhField(row,'INCAPACITANTES') || 0),
+    mortal:       parseFloat(hhField(row,'MORTAL') || 0),
+    leves:        parseFloat(hhField(row,'ACCIDENTES LEVES') || 0),
+    diasPerdidos: parseFloat(hhField(row,'DÍAS PERDIDOS','DIAS PERDIDOS') || 0),
+  };
+}
+
+async function loadHH(){
+  await Promise.allSettled(
+    Object.entries(HH_URLS).map(async ([key, url]) => {
+      if(!url) return;
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const json = await r.json();
+      const rows = json['tabla_HH'] || json['hh'] || json['data'] || [];
+      HH_DATA[key] = rows.map(parseHHRow);
+    })
+  );
+  // Si alguna unidad no cargó desde GitHub, usar fallback embebido
+  if(!HH_DATA.casma     && typeof HH_CASMA_FALLBACK  !== 'undefined') HH_DATA.casma     = HH_CASMA_FALLBACK.map(parseHHRow);
+  if(!HH_DATA.beneficio && typeof HH_PLANTA_FALLBACK !== 'undefined') HH_DATA.beneficio = HH_PLANTA_FALLBACK.map(parseHHRow);
+  // Determinar año más reciente disponible como default
+  const allRows = Object.values(HH_DATA).flat().filter(Boolean);
+  if(allRows.length){
+    const maxAnio = Math.max(...allRows.map(r=>r.anio));
+    hhFilters.anio = maxAnio;
+  }
+  updatePeriodLabel();
+  renderHH();
+}
+
+function toggleHHIndice(key){
+  const idx = hhFilters.indices.indexOf(key);
+  if(idx >= 0) {
+    if(hhFilters.indices.length > 1) hhFilters.indices.splice(idx,1); // mínimo 1 activo
+  } else {
+    hhFilters.indices.push(key);
+  }
+  renderHH();
+}
+
+const MES_NOM_HH = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+
+function buildKpiBlock(unitId, anioSel){
+  const rows = (HH_DATA[unitId]||[]).filter(r=>r.anio===anioSel);
+  if(!rows.length) return '';
+  const last = rows[rows.length-1];
+  const mes  = MES_NOM_HH[last.mes]||last.mes;
+  const totalHH = rows.reduce((s,r)=>s+r.hh,0);
+  const col = (v,meta)=> v<=meta?'#2dd4a0':'#f26b6b';
+  const kpi = (lbl,val,meta,c)=>`
+    <div style="background:var(--sf3);border:1px solid var(--bd);border-radius:9px;padding:8px 14px;flex:1;min-width:100px">
+      <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${lbl}</div>
+      <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:${c};line-height:1">${val}</div>
+      ${meta?`<div style="font-size:9px;color:var(--tx3);margin-top:2px">Meta: ${meta}</div>`:''}
+    </div>`;
+  return `
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+      ${kpi('HH Acum. '+anioSel,(totalHH/1000).toFixed(1)+'K','','#4f8ef7')}
+      ${kpi('IF · '+mes,parseFloat(last.IF).toFixed(2),last.metaIF,col(last.IF,last.metaIF))}
+      ${kpi('IS · '+mes,parseFloat(last.IS).toFixed(2),last.metaIS,col(last.IS,last.metaIS))}
+      ${kpi('IA · '+mes,parseFloat(last.IA).toFixed(2),last.metaIA,col(last.IA,last.metaIA))}
+    </div>`;
+}
+
+function renderHH(){
+  const container = document.getElementById('charts-hh');
+  const activeIdx = hhFilters.indices;
+
+  const allRows = Object.values(HH_DATA).flat().filter(Boolean);
+  const aniosDisp = [...new Set(allRows.map(r=>r.anio))].filter(a=>a>0).sort((a,b)=>a-b);
+  if(!hhFilters.anio || !aniosDisp.includes(hhFilters.anio)){
+    hhFilters.anio = aniosDisp[aniosDisp.length-1] || 2026;
+  }
+  const anioSel = hhFilters.anio;
+
+  const chips = HH_INDICES.map(idx =>
+    `<button class="filter-chip ${activeIdx.includes(idx.key)?'active':''}"
+      onclick="toggleHHIndice('${idx.key}')"
+      style="${activeIdx.includes(idx.key)?'border-color:'+idx.color+';color:'+idx.color:''}">
+      <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${idx.color};margin-right:4px"></span>${idx.key}
+    </button>`
+  ).join('');
+
+  const yearChips = aniosDisp.map(a =>
+    `<button class="filter-chip ${parseInt(anioSel)===parseInt(a)?'active':''}" onclick="setHHAnio(${a})">${a}</button>`
+  ).join('');
+
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;gap:14px;align-items:start;width:100%">
+
+      <!-- Col 1: Filtros -->
+      <div style="background:var(--sf3);border:1px solid var(--bd);border-radius:10px;padding:12px 10px;display:flex;flex-direction:column;gap:10px;position:sticky;top:80px">
+        <div>
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:6px">Año</div>
+          <div style="display:flex;flex-direction:column;gap:4px">${yearChips}</div>
+        </div>
+        <div style="height:1px;background:var(--bd)"></div>
+        <div>
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:6px">Índices</div>
+          <div style="display:flex;flex-direction:column;gap:4px">${chips}</div>
+        </div>
+        <div style="height:1px;background:var(--bd)"></div>
+        <div style="font-size:9px;color:var(--tx3);line-height:1.4">— — línea<br>punteada<br>= meta</div>
+      </div>
+
+      <!-- Col 2: Minera Casma -->
+      <div class="card" style="padding:14px 16px">
+        <span class="unit-lbl ul-casma">Minera Casma</span>
+        ${buildKpiBlock('casma', anioSel)}
+        <div style="position:relative;height:380px"><canvas id="ch-hh-casma"></canvas></div>
+      </div>
+
+      <!-- Col 3: Planta Beneficio -->
+      <div class="card" style="padding:14px 16px">
+        <span class="unit-lbl ul-beneficio">Planta Beneficio</span>
+        ${buildKpiBlock('beneficio', anioSel)}
+        <div style="position:relative;height:380px"><canvas id="ch-hh-beneficio"></canvas></div>
+      </div>
+
+    </div>
+  `;
+
+  // Render charts for both units
+  ['casma','beneficio'].forEach(uid => {
+    const allUnitRows = HH_DATA[uid];
+    if(!allUnitRows) return;
+    const rows = allUnitRows.filter(r => r.anio === anioSel);
+    if(!rows.length) return;
+    const cid = 'ch-hh-' + uid;
+    const canvas = document.getElementById(cid);
+    if(!canvas) return;
+    destroyChart(cid);
+
+    const labels = rows.map(r => MES_NOM_HH[r.mes]);
+    const datasets = [];
+    HH_INDICES.filter(idx => activeIdx.includes(idx.key)).forEach(idx => {
+      datasets.push({
+        label: idx.key,
+        data: rows.map(r => +parseFloat(r[idx.key]||0).toFixed(3)),
+        borderColor: idx.color, backgroundColor: idx.color+'18',
+        borderWidth:2, pointRadius:3, pointHoverRadius:5, tension:0.3, fill:false,
+      });
+      datasets.push({
+        label: 'Meta '+idx.key,
+        data: rows.map(r => +parseFloat(r['meta'+idx.key]||0).toFixed(3)),
+        borderColor: idx.color+'55', borderWidth:1.5,
+        borderDash:[5,4], pointRadius:0, tension:0, fill:false,
+      });
+    });
+
+    chartRegistry[cid] = new Chart(canvas, {
+      type: 'line',
+      data: { labels, datasets },
+      options: {
+        responsive:true, maintainAspectRatio:false,
+        interaction:{ mode:'index', intersect:false },
+        plugins:{
+          legend:{
+            display:true, position:'bottom',
+            labels:{ color:'#7b82a0', font:{size:9}, boxWidth:12, padding:8,
+              filter: item => !item.text.startsWith('Meta') }
+          },
+          tooltip:{
+            filter: item => !item.dataset.label.startsWith('Meta'),
+            callbacks:{ label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}` }
+          }
+        },
+        scales:{
+          x:{ ticks:{color:'#7b82a0',font:{size:9},maxRotation:0}, grid:{color:'rgba(255,255,255,0.04)'} },
+          y:{ ticks:{color:'#7b82a0',font:{size:9}}, grid:{color:'rgba(255,255,255,0.04)'}, min:0 },
+        }
+      }
+    });
+  });
+}
+
+function setHHAnio(a){
+  hhFilters.anio = parseInt(a);
+  renderHH();
+}
+
+/* ══════════════════════════════════════
+   CARGA DE DATOS DESDE GITHUB (JSON)
+   Reemplaza GITHUB_RAW_URL con la URL
+   raw de tu repositorio GitHub, ej:
+   https://raw.githubusercontent.com/
+     tu-usuario/tu-repo/main/ssoma.json
+══════════════════════════════════════ */
+
+// URL de los JSON en GitHub (raw content)
+const JSON_URLS = {
+  casma:     'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/EVENTOS_CASMA.json',
+  beneficio: 'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/EVENTOS_BENEFICIO.json',
+  // onoaga: pendiente
+};
+
+// Almacén de datos cargados
+let LOADED_DATA = { casma: null, beneficio: null };
+let DATA_LOADED = false;
+
+// Indicador de carga en el header
+function setLoadingState(msg, ok){
+  const el = document.getElementById('slbl');
+  if(el) el.textContent = msg;
+  const dot = document.getElementById('load-dot');
+  if(dot){
+    dot.className = 'sdot ' + (ok===true?'ok':ok===false?'danger':'warn');
+  }
+}
+
+// Carga todos los JSON en paralelo
+async function loadAllData(){
+  setLoadingState('Cargando datos…', null);
+  // Mapeo de nombres de campo del JSON real → nombres internos del dashboard
+  const KEY_MAP = {
+    casma:     'Incidentes_Casma',
+    beneficio: 'Incidentes_Beneficio',
+  };
+
+  // Normaliza una fila del JSON real al formato interno
+  function parseRow(r){
+    return {
+      mes:       parseInt(r['Mes']      || r['mes']       || 0),
+      guardia:   (r['Guardia']          || r['guardia']   || '').trim(),
+      turno:     (r['Turno']            || r['turno']     || '').trim(),
+      area:      (r['Area']             || r['area']      || '').trim(),
+      incap:     parseInt(r['ACCIDENTE INCAPACITANTE'] || r['incap']     || 0),
+      leve:      parseInt(r['ACCIDENTE LEVE']          || r['leve']      || 0),
+      danio:     parseInt(r['DAÑO A LA PROPIEDAD']     || r['danio']     || 0),
+      incidente: parseInt(r['INCIDENTE']               || r['incidente'] || 0),
+      ambiental: parseInt(r['INCIDENTE AMBIENTAL']     || r['ambiental'] || 0),
+    };
+  }
+
+  const results = await Promise.allSettled(
+    Object.entries(JSON_URLS).map(async ([key, url]) => {
+      const r = await fetch(url);
+      if(!r.ok) throw new Error(`HTTP ${r.status}`);
+      const json = await r.json();
+      // Soporta tanto el formato real (Incidentes_Casma:[...]) como el normalizado (accidentes:[...])
+      const rootKey = KEY_MAP[key];
+      const raw = json[rootKey] || json['accidentes'] || json['data'] || [];
+      LOADED_DATA[key] = raw.map(parseRow);
+      return key;
+    })
+  );
+  const failed = results.filter(r=>r.status==='rejected').length;
+  if(failed === 0){
+    DATA_LOADED = true;
+    setLoadingState('Datos actualizados', true);
+  } else {
+    // Fallback a datos de prueba para unidades que fallaron
+    if(!LOADED_DATA.casma)     LOADED_DATA.casma     = CASMA_RAW_FALLBACK;
+    if(!LOADED_DATA.beneficio) LOADED_DATA.beneficio = null;
+      setLoadingState(`${failed} unidad(es) sin conexión — usando datos locales`, false);
+  }
+  renderAll();
+}
+
+// ── DATOS DE RESPALDO (se usan si el fetch falla) ──
+const CASMA_RAW_FALLBACK = [];
+
+// Estado de filtros activos para la sección accidentes
+let accFilters = { guardia:'todas', turno:'todos', axisX:'mes', axisD:'tipo' };
+
+function sumField(rows, field){ return rows.reduce((s,r)=>s+r[field],0); }
+
+function filterUnit(unitId, g, t){
+  const raw = LOADED_DATA[unitId] || (unitId==='casma' ? CASMA_RAW_FALLBACK : null);
+  if(!raw) return null;
+  return raw.filter(r=>
+    (g==='todas'||r.guardia===g) &&
+    (t==='todos'||r.turno===t)
+  );
+}
+// Alias para compatibilidad
+function filterCasma(g, t){ return filterUnit('casma', g, t)||[]; }
+
+function renderAccidentes(){
+  const container = document.getElementById('charts-acc');
+
+  const X_OPTS  = [{v:'mes',l:'Mes'},{v:'area',l:'Área'},{v:'guardia',l:'Guardia'},{v:'turno',l:'Turno'}];
+  const D_OPTS  = [{v:'tipo',l:'Tipo evento'},{v:'area',l:'Área'},{v:'guardia',l:'Guardia'},{v:'turno',l:'Turno'}];
+
+  const mkX = o => `<button class="filter-chip ${accFilters.axisX===o.v?'active':''}" onclick="setAccAxis('axisX','${o.v}')">${o.l}</button>`;
+  const mkD = o => `<button class="filter-chip ${accFilters.axisD===o.v?'active':''}" onclick="setAccAxis('axisD','${o.v}')">${o.l}</button>`;
+
+  container.innerHTML = `
+    <div style="display:grid;grid-template-columns:140px 1fr 1fr;gap:14px;align-items:start;width:100%">
+      <!-- Filtros -->
+      <div style="background:var(--sf3);border:1px solid var(--bd);border-radius:10px;padding:12px 10px;display:flex;flex-direction:column;gap:10px;position:sticky;top:80px">
+        <div>
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:6px">Guardia</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <button class="filter-chip ${accFilters.guardia==='todas'?'active':''}" onclick="setAccFilter('guardia','todas')">Todas</button>
+            <button class="filter-chip ${accFilters.guardia==='A'?'active':''}" onclick="setAccFilter('guardia','A')">A</button>
+            <button class="filter-chip ${accFilters.guardia==='B'?'active':''}" onclick="setAccFilter('guardia','B')">B</button>
+            <button class="filter-chip ${accFilters.guardia==='C'?'active':''}" onclick="setAccFilter('guardia','C')">C</button>
+          </div>
+        </div>
+        <div style="height:1px;background:var(--bd)"></div>
+        <div>
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:6px">Turno</div>
+          <div style="display:flex;flex-direction:column;gap:4px">
+            <button class="filter-chip ${accFilters.turno==='todos'?'active':''}" onclick="setAccFilter('turno','todos')">Todos</button>
+            <button class="filter-chip ${accFilters.turno==='DIA'?'active':''}" onclick="setAccFilter('turno','DIA')">Día</button>
+            <button class="filter-chip ${accFilters.turno==='NOCHE'?'active':''}" onclick="setAccFilter('turno','NOCHE')">Noche</button>
+          </div>
+        </div>
+        <div style="height:1px;background:var(--bd)"></div>
+        <div>
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:6px">X</div>
+          <div style="display:flex;flex-direction:column;gap:4px">${X_OPTS.map(mkX).join('')}</div>
+        </div>
+        <div style="height:1px;background:var(--bd)"></div>
+        <div>
+          <div style="font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:6px">Detalle</div>
+          <div style="display:flex;flex-direction:column;gap:4px">${D_OPTS.filter(o=>o.v!==accFilters.axisX).map(mkD).join('')}</div>
+        </div>
+        <div style="height:1px;background:var(--bd)"></div>
+        <div style="font-size:9px;color:var(--tx3)">Y = Frecuencia</div>
+      </div>
+      <!-- Casma -->
+      <div id="acc-col-casma"></div>
+      <!-- Beneficio -->
+      <div id="acc-col-beneficio"></div>
+    </div>
+  `;
+
+  renderAccCols();
+}
+
+function setAccFilter(key, val){
+  accFilters[key] = val;
+  renderAccidentes();
+}
+function setAccAxis(axis, val){
+  accFilters[axis] = val;
+  // Si X y Detalle quedan iguales, cambia el otro
+  if(accFilters.axisX === accFilters.axisD){
+    if(axis==='axisX') accFilters.axisD = 'tipo';
+    else accFilters.axisX = 'mes';
+  }
+  renderAccidentes();
+}
+
+function renderAccCols(){
+  const g = accFilters.guardia;
+  const t = accFilters.turno;
+  const axX = accFilters.axisX;  // what goes on X axis
+  const axD = accFilters.axisD;  // what splits into datasets (detail/color)
+  const MES_NOM = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const TIPOS = [
+    {key:'incap',  label:'Incapacitante', color:'#f26b6b'},
+    {key:'leve',   label:'Leve',          color:'#f5a52a'},
+    {key:'danio',  label:'Daño propiedad',color:'#a78bfa'},
+    {key:'incidente',label:'Incidente',   color:'#4f8ef7'},
+    {key:'ambiental',label:'Inc. ambiental',color:'#2dd4a0'},
+  ];
+  const PALETTE = ['#f26b6b','#f5a52a','#4f8ef7','#2dd4a0','#a78bfa','#fb923c','#e879f9','#38bdf8','#a3e635'];
+
+  // Generic helpers
+  function getAxisValues(rows, dim){
+    if(dim==='mes')     return [...new Set(rows.map(r=>r.mes))].sort((a,b)=>a-b);
+    if(dim==='area')    return [...new Set(rows.map(r=>r.area))];
+    if(dim==='guardia') return ['A','B','C'];
+    if(dim==='turno')   return ['DIA','NOCHE'];
+    if(dim==='tipo')    return TIPOS.map(tp=>tp.key);
+    return [];
+  }
+  function getLabel(dim, val){
+    if(dim==='mes')  return MES_NOM[val]||val;
+    if(dim==='tipo') return TIPOS.find(tp=>tp.key===val)?.label||val;
+    return String(val);
+  }
+  function getColor(dim, val, i){
+    if(dim==='tipo') return TIPOS.find(tp=>tp.key===val)?.color||PALETTE[i%PALETTE.length];
+    return PALETTE[i%PALETTE.length];
+  }
+  function matchDim(row, dim, val){
+    if(dim==='mes')     return row.mes===val;
+    if(dim==='area')    return row.area===val;
+    if(dim==='guardia') return row.guardia===val;
+    if(dim==='turno')   return row.turno===val;
+    return true;
+  }
+  function sumAll(rows){ return rows.reduce((s,r)=>s+r.incap+r.leve+r.danio+r.incidente+r.ambiental,0); }
+  function sumTipo(rows, key){ return rows.reduce((s,r)=>s+r[key],0); }
+
+  const unitsConfig = [
+    {id:'casma',    label:'Minera Casma',    cls:'ul-casma',    color:'#4f8ef7', data: filterUnit('casma',g,t)},
+    {id:'beneficio',label:'Planta Beneficio',cls:'ul-beneficio',color:'#2dd4a0', data: filterUnit('beneficio',g,t)},
+  ];
+
+  const accCardMap = {};
+  unitsConfig.forEach(u => {
+    const id = 'ch-acc-' + u.id + '-dyn';
+    destroyChart('ch-acc-' + u.id);
+    destroyChart(id);
+
+    if(!u.data){
+      accCardMap[u.id] = `<div class="card">
+        <span class="unit-lbl ${u.cls}">${u.label}</span>
+        <div class="ct">Accidentes</div>
+        <div style="height:340px;display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:12px">Datos pendientes de carga</div>
+      </div>`;
+      return;
+    }
+
+    const rows = u.data;
+
+    // Build X labels
+    const xVals = getAxisValues(rows, axX).filter(xv=> {
+      const sub = rows.filter(r=>matchDim(r,axX,xv));
+      return sumAll(sub)>0 || axX==='mes';
+    });
+    const xLabels = xVals.map(xv=>getLabel(axX,xv));
+
+    // Build datasets by detail dimension
+    let dVals = getAxisValues(rows, axD);
+    // For tipo filter out zeros
+    if(axD==='tipo') dVals = dVals.filter(dv=>rows.reduce((s,r)=>s+r[dv],0)>0);
+    else dVals = dVals.filter(dv=>rows.filter(r=>matchDim(r,axD,dv)).reduce((s,r)=>s+sumAll([r]),0)>0);
+
+    const datasets = dVals.map((dv,i)=>({
+      label: getLabel(axD,dv).length>18?getLabel(axD,dv).substring(0,17)+'…':getLabel(axD,dv),
+      data: xVals.map(xv=>{
+        const sub = rows.filter(r=>matchDim(r,axX,xv)&&matchDim(r,axD,dv));
+        return axD==='tipo' ? sumTipo(sub,dv) : sumAll(sub);
+      }),
+      backgroundColor: getColor(axD,dv,i)+'bb',
+      borderRadius: 3,
+    }));
+
+    const isTypeSplit = axD==='tipo';
+    const totInc = sumField(rows,'incap');
+    const totLeve = sumField(rows,'leve');
+    const totDanio = sumField(rows,'danio');
+    const totEvt = sumField(rows,'incidente');
+    const totAmb = sumField(rows,'ambiental');
+
+    accCardMap[u.id] = `<div class="card">
+      <span class="unit-lbl ${u.cls}">${u.label}</span>
+      <div class="ct">Eventos · X: ${getLabel(axX,axX).charAt(0).toUpperCase()+getLabel(axX,axX).slice(1)} · Detalle: ${axD==='tipo'?'Tipo':getLabel(axD,axD).charAt(0).toUpperCase()+getLabel(axD,axD).slice(1)}</div>
+      ${isTypeSplit?`<div style="display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 8px">
+        <span style="font-size:10px;color:var(--tx2)">Incap: <b style="color:#f26b6b">${totInc}</b></span>
+        <span style="font-size:10px;color:var(--tx2)">Leve: <b style="color:#f5a52a">${totLeve}</b></span>
+        <span style="font-size:10px;color:var(--tx2)">Daño: <b style="color:#a78bfa">${totDanio}</b></span>
+        <span style="font-size:10px;color:var(--tx2)">Inc: <b style="color:#4f8ef7">${totEvt}</b></span>
+        ${totAmb>0?`<span style="font-size:10px;color:var(--tx2)">Amb: <b style="color:#2dd4a0">${totAmb}</b></span>`:''}
+      </div>`:''}
+      <div style="position:relative;height:380px"><canvas id="${id}" role="img" aria-label="Accidentes ${u.label}"></canvas></div>
+    </div>`;
+  });
+
+  // Render each unit into its own column
+  const accColMap = {casma:'acc-col-casma', beneficio:'acc-col-beneficio'};
+  unitsConfig.forEach(u => {
+    const el = document.getElementById(accColMap[u.id]);
+    if(el) el.innerHTML = accCardMap[u.id] || '';
+  });
+
+  // Render charts (generic engine)
+  unitsConfig.forEach(u => {
+    if(!u.data) return;
+    const id = 'ch-acc-' + u.id + '-dyn';
+    const rows = u.data;
+    // Rebuild labels + datasets using same helpers defined above
+    const xVals2 = getAxisValues(rows, axX).filter(xv=>{
+      const sub=rows.filter(r=>matchDim(r,axX,xv));
+      return sumAll(sub)>0||axX==='mes';
+    });
+    const xLabels2 = xVals2.map(xv=>getLabel(axX,xv));
+    let dVals2 = getAxisValues(rows, axD);
+    if(axD==='tipo') dVals2=dVals2.filter(dv=>rows.reduce((s,r)=>s+r[dv],0)>0);
+    else dVals2=dVals2.filter(dv=>rows.filter(r=>matchDim(r,axD,dv)).reduce((s,r)=>s+sumAll([r]),0)>0);
+    const ds2 = dVals2.map((dv,i)=>({
+      label:getLabel(axD,dv).length>18?getLabel(axD,dv).substring(0,17)+'…':getLabel(axD,dv),
+      data:xVals2.map(xv=>{
+        const sub=rows.filter(r=>matchDim(r,axX,xv)&&matchDim(r,axD,dv));
+        return axD==='tipo'?sumTipo(sub,dv):sumAll(sub);
+      }),
+      backgroundColor:getColor(axD,dv,i)+'bb',
+      borderRadius:3,
+    }));
+    const canvas = document.getElementById(id);
+    if(!canvas) return;
+    const showLegend = dVals2.length > 1;
+    const stackBars = axD==='tipo';
+    chartRegistry[id]=new Chart(canvas,{
+      type:'bar',
+      data:{labels:xLabels2, datasets:ds2},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{
+          legend:{display:showLegend,position:'bottom',labels:{color:'#7b82a0',font:{size:9},boxWidth:9,padding:7}},
+          tooltip:{mode:'index',intersect:false}
+        },
+        scales:{
+          x:{ticks:{color:'#7b82a0',font:{size:9},maxRotation:0},grid:{color:'rgba(255,255,255,0.04)'},stacked:stackBars},
+          y:{ticks:{color:'#7b82a0',font:{size:9},stepSize:1},grid:{color:'rgba(255,255,255,0.04)'},stacked:stackBars,min:0},
+        }
+      }
+    });
+  });
+
+  // Pills
+  const allRows = filterCasma(g,t);
+  const totInc2=sumField(allRows,'incap');
+  const totLeve2=sumField(allRows,'leve');
+  const totAmb2=sumField(allRows,'ambiental');
+  document.getElementById('pills-acc').innerHTML=
+    `<span class="pill amber">Leves: ${totLeve2}</span>`+
+    `<span class="pill red">Incap: ${totInc2}</span>`+
+    (totAmb2>0?`<span class="pill green">Amb: ${totAmb2}</span>`:'')+
+    `<span class="pill blue">Incidentes: ${sumField(allRows,'incidente')}</span>`;
+}
+
+/* ══════════════════════════════════════
+   IDS — CARGA DESDE GITHUB + EJES DINÁMICOS
+══════════════════════════════════════ */
+
+const IDS_URLS = {
+  beneficio: 'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/IDS_PLANTA.json',
+  casma:     'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/IDS_CASMA.json',
+  // onoaga: pendiente
+};
+
+let IDS_DATA = { beneficio: null, casma: null };
+let idsFilters = { axisX: 'ÁREA', axisD: 'GUARDIA' };
+
+async function loadIDS(){
+  await Promise.allSettled(
+    Object.entries(IDS_URLS).map(async ([key, url]) => {
+      if(!url) return;
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const json = await r.json();
+      const rawRows = (json.ids || []).map(row => {
+        const prog = parseFloat(row['PROGRAMADO'] || 0);
+        const ejec = parseFloat(row['EJECUTADO']  || 0);
+        // Normalizar guardia: "NO TIENE G" → "SIN GUARDIA"
+        const guardia = String(row['GUARDIA'] || '').trim();
+        const guardiaClean = (guardia === '' || guardia.toUpperCase().includes('NO TIENE'))
+          ? 'SIN GUARDIA' : guardia.toUpperCase();
+        return {
+          mes:        parseInt(row['Mes']               || 0),
+          anio:       parseInt(row['Año']               || 0),
+          nombre:     String(row['APELLIDOS Y NOMBRES'] || '').trim(),
+          area:       String(row['ÁREA']                || '').trim(),
+          cargo:      String(row['CARGO']               || '').trim(),
+          guardia:    guardiaClean,
+          indicador:  String(row['Indicador']           || '').trim(),
+          programado: prog,
+          ejecutado:  ejec,
+        };
+      });
+      // Solo incluir filas con programado > 0 (evita división por cero)
+      IDS_DATA[key] = rawRows.filter(r => r.programado > 0);
+    })
+  );
+  renderIDS();
+}
+
+function renderIDS(){
+  const container = document.getElementById('charts-ids');
+
+  // Dimensiones disponibles para X y Detalle
+  const DIMS_X = [
+    {v:'ÁREA',      l:'Área'},
+    {v:'GUARDIA',   l:'Guardia'},
+    {v:'mes',       l:'Mes'},
+    {v:'cargo',     l:'Cargo'},
+    {v:'indicador', l:'Indicador'},
+  ];
+  const DIMS_D = [
+    {v:'ninguno',   l:'Global'},   // sin desglose
+    {v:'ÁREA',      l:'Área'},
+    {v:'GUARDIA',   l:'Guardia'},
+    {v:'mes',       l:'Mes'},
+    {v:'cargo',     l:'Cargo'},
+    {v:'indicador', l:'Indicador'},
+  ];
+
+  const mkX = d => `<button class="filter-chip ${idsFilters.axisX===d.v?'active':''}" onclick="setIDSAxis('axisX','${d.v}')">${d.l}</button>`;
+  const mkD = d => `<button class="filter-chip ${idsFilters.axisD===d.v?'active':''}" onclick="setIDSAxis('axisD','${d.v}')">${d.l}</button>`;
+
+  container.innerHTML = `
+    <div class="acc-filters" style="flex-direction:column;gap:10px;align-items:flex-start">
+
+      <!-- CUMPLIMIENTO GLOBAL -->
+      <div id="ids-global-bar" style="width:100%"></div>
+
+      <!-- EJES -->
+      <div style="display:flex;gap:16px;flex-wrap:wrap;align-items:center;padding:8px 12px;background:var(--sf3);border-radius:10px;width:100%">
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+          <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3)">X</span>
+          ${DIMS_X.map(mkX).join('')}
+        </div>
+        <div style="width:1px;height:24px;background:var(--bd2)"></div>
+        <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+          <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);min-width:44px">Detalle</span>
+          ${DIMS_D.filter(d=>d.v!==idsFilters.axisX).map(mkD).join('')}
+        </div>
+        <div style="margin-left:auto;font-size:10px;color:var(--tx3)">Y = % cumplimiento (Ejec/Prog)</div>
+      </div>
+    </div>
+    <div class="cg3" style="margin-top:14px" id="ids-cols"></div>
+  `;
+
+  renderIDSCols();
+}
+
+function setIDSAxis(axis, val){
+  idsFilters[axis] = val;
+  // 'ninguno' never conflicts with X — skip the dedup check
+  if(idsFilters.axisD !== 'ninguno' && idsFilters.axisX === idsFilters.axisD){
+    idsFilters[axis==='axisX'?'axisD':'axisX'] = axis==='axisX'?'ninguno':'ÁREA';
+  }
+  renderIDS();
+}
+
+function renderIDSGlobal(){
+  const el = document.getElementById('ids-global-bar');
+  if(!el) return;
+
+  // Recopilar todos los datos disponibles de todas las unidades
+  const allRows = Object.values(IDS_DATA).flat().filter(Boolean);
+  if(!allRows.length){ el.innerHTML=''; return; }
+
+  // Meses disponibles
+  const MES_NOM = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const meses = [...new Set(allRows.map(r=>r.mes))].sort((a,b)=>a-b);
+
+  // Mes seleccionado (persiste en idsFilters)
+  if(!idsFilters.mes) idsFilters.mes = meses[meses.length-1]; // último mes por defecto
+  const mesSel = idsFilters.mes;
+
+  // Cálculo global del mes seleccionado
+  const rowsMes = allRows.filter(r => r.mes === mesSel);
+  const totalProg = rowsMes.reduce((s,r)=>s+r.programado,0);
+  const totalEjec = rowsMes.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+  const pctGlobal = totalProg > 0 ? Math.round(totalEjec/totalProg*100) : 0;
+  const color = pctGlobal>=80?'#2dd4a0':pctGlobal>=50?'#f5a52a':'#f26b6b';
+  const bgColor = pctGlobal>=80?'rgba(45,212,160,0.08)':pctGlobal>=50?'rgba(245,165,42,0.08)':'rgba(242,107,107,0.08)';
+  const borderColor = pctGlobal>=80?'rgba(45,212,160,0.3)':pctGlobal>=50?'rgba(245,165,42,0.3)':'rgba(242,107,107,0.3)';
+
+  // Desglose por unidad disponible
+  const unidadesDisp = [
+    {id:'beneficio', label:'Planta Beneficio', cls:'ul-beneficio'},
+    {id:'casma',     label:'Minera Casma',     cls:'ul-casma'},
+  ].filter(u => IDS_DATA[u.id]);
+
+  const desglose = unidadesDisp.map(u => {
+    const rows = (IDS_DATA[u.id]||[]).filter(r=>r.mes===mesSel);
+    const p = rows.reduce((s,r)=>s+r.programado,0);
+    const e = rows.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+    const pct = p>0?Math.round(e/p*100):0;
+    const c = pct>=80?'#2dd4a0':pct>=50?'#f5a52a':'#f26b6b';
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;min-width:90px">
+      <span style="font-size:10px;color:var(--tx2)">${u.label.replace('Minera ','').replace('Planta ','')}</span>
+      <span style="font-size:20px;font-weight:600;font-family:var(--mono);color:${c}">${pct}%</span>
+      <span style="font-size:10px;color:var(--tx3)">${e}/${p}</span>
+    </div>`;
+  }).join('<div style="width:1px;background:var(--bd2);align-self:stretch"></div>');
+
+  // Filtros de mes
+  const mesBtns = meses.map(m =>
+    `<button class="filter-chip ${mesSel===m?'active':''}" onclick="setIDSMes(${m})">${MES_NOM[m]}</button>`
+  ).join('');
+
+  el.innerHTML = `
+    <div style="background:${bgColor};border:1px solid ${borderColor};border-radius:12px;padding:14px 18px;margin-bottom:4px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+        <div style="display:flex;align-items:baseline;gap:10px">
+          <span style="font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Cumplimiento global IDS</span>
+          <span style="font-size:11px;color:var(--tx3)">· ${MES_NOM[mesSel]} ${allRows[0]?.anio||''}</span>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+          <span style="font-size:10px;color:var(--tx3)">Mes:</span>
+          ${mesBtns}
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+        <!-- Número grande -->
+        <div style="display:flex;flex-direction:column;gap:2px;min-width:100px">
+          <span style="font-size:42px;font-weight:600;font-family:var(--mono);color:${color};line-height:1">${pctGlobal}%</span>
+          <span style="font-size:11px;color:var(--tx2)">${totalEjec} ejec. / ${totalProg} prog.</span>
+        </div>
+
+        <!-- Barra de progreso grande -->
+        <div style="flex:1;min-width:180px">
+          <div style="height:10px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:hidden;margin-bottom:6px">
+            <div style="height:100%;width:${pctGlobal}%;background:${color};border-radius:5px;transition:width .6s ease"></div>
+          </div>
+          <div style="display:flex;justify-content:space-between">
+            <span style="font-size:10px;color:var(--tx3)">0%</span>
+            <span style="font-size:10px;color:#f5a52a">Meta 80%</span>
+            <span style="font-size:10px;color:var(--tx3)">100%</span>
+          </div>
+          <!-- Marcador de meta -->
+          <div style="position:relative;height:6px;margin-top:-22px;pointer-events:none">
+            <div style="position:absolute;left:80%;top:-8px;width:1px;height:26px;background:rgba(245,165,42,0.5)"></div>
+          </div>
+        </div>
+
+        <!-- Desglose por unidad -->
+        ${unidadesDisp.length>1?`
+        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding-left:12px;border-left:1px solid var(--bd2)">
+          ${desglose}
+        </div>`:''}
+      </div>
+    </div>
+  `;
+}
+
+function setIDSMes(mes){
+  idsFilters.mes = mes;
+  renderIDSGlobal();
+}
+
+function renderIDSCols(){
+  const axX = idsFilters.axisX;
+  const axD = idsFilters.axisD;
+  const MES_NOM = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const PALETTE = ['#4f8ef7','#2dd4a0','#a78bfa','#f5a52a','#f26b6b','#fb923c','#e879f9','#38bdf8'];
+
+  function getRowVal(row, dim){
+    if(dim==='ÁREA')     return row.area;
+    if(dim==='GUARDIA')  return row.guardia;
+    if(dim==='mes')      return row.mes;
+    if(dim==='cargo')    return row.cargo;
+    if(dim==='indicador')return row.indicador;
+    return '';
+  }
+  function getLabel(dim, val){
+    if(dim==='mes') return MES_NOM[val]||val;
+    return String(val).length > 18 ? String(val).substring(0,17)+'…' : String(val);
+  }
+
+  // Calcular % cumplimiento agrupado por xVal + dVal
+  // Ejecutado se topa en programado a nivel de persona (no se infla si hace más)
+  function calcPct(rows, xVal, dVal){
+    const sub = rows.filter(r => getRowVal(r,axX)==xVal && getRowVal(r,axD)==dVal);
+    const prog = sub.reduce((s,r)=>s+r.programado,0);
+    const ejec = sub.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+    return prog > 0 ? Math.round(ejec/prog*100) : 0;
+  }
+
+  const unitsConfig = [
+    {id:'beneficio', label:'Planta Beneficio', cls:'ul-beneficio', color:'#2dd4a0'},
+    {id:'casma',     label:'Minera Casma',     cls:'ul-casma',     color:'#4f8ef7'},
+  ];
+
+  let html = '';
+  unitsConfig.forEach(u => {
+    const chartId = 'ch-ids-' + u.id;
+    destroyChart(chartId);
+
+    const rows = IDS_DATA[u.id];
+    if(!rows){
+      html += `<div class="ids-card">
+        <div class="ids-card-head"><span class="unit-lbl ${u.cls}" style="margin-bottom:0">${u.label}</span></div>
+        <div style="height:180px;display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:12px">Datos pendientes de carga</div>
+      </div>`;
+      return;
+    }
+
+    // Valores únicos de cada eje, ordenados
+    let xVals = [...new Set(rows.map(r=>getRowVal(r,axX)))];
+    if(axX==='mes') xVals.sort((a,b)=>a-b);
+    else xVals.sort();
+
+    let dVals = [...new Set(rows.map(r=>getRowVal(r,axD)))];
+    if(axD==='mes') dVals.sort((a,b)=>a-b);
+    else dVals.sort();
+
+    // Totales generales para el header
+    const totalProg = rows.reduce((s,r)=>s+r.programado,0);
+    const totalEjec = rows.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+    const pctGlobal = totalProg>0 ? Math.round(totalEjec/totalProg*100) : 0;
+
+    html += `<div class="card" style="display:flex;flex-direction:column;gap:0">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <span class="unit-lbl ${u.cls}" style="margin-bottom:0">${u.label}</span>
+        <div style="display:flex;gap:10px;align-items:center">
+          <span style="font-size:11px;color:var(--tx2)">Prog: <b style="color:var(--tx)">${totalProg}</b></span>
+          <span style="font-size:11px;color:var(--tx2)">Ejec: <b style="color:var(--tx)">${totalEjec}</b></span>
+          <span class="badge ${pctGlobal>=80?'bg':pctGlobal>=50?'ba':'br'}" style="font-size:12px;padding:3px 10px">${pctGlobal}%</span>
+        </div>
+      </div>
+      <div class="ct">Cumplimiento IDS · X: ${axX==='ÁREA'?'Área':axX==='GUARDIA'?'Guardia':axX==='mes'?'Mes':axX==='cargo'?'Cargo':'Indicador'}</div>
+      <div style="position:relative;height:300px;margin-top:10px"><canvas id="${chartId}" role="img" aria-label="IDS ${u.label}"></canvas></div>
+    </div>`;
+  });
+
+  document.getElementById('ids-cols').innerHTML = html;
+
+  // Render charts
+  unitsConfig.forEach(u => {
+    const rows = IDS_DATA[u.id];
+    if(!rows) return;
+    const chartId = 'ch-ids-' + u.id;
+    const canvas = document.getElementById(chartId);
+    if(!canvas) return;
+
+    let xVals = [...new Set(rows.map(r=>getRowVal(r,axX)))];
+    if(axX==='mes') xVals.sort((a,b)=>a-b);
+    else xVals.sort();
+
+    let dVals = [...new Set(rows.map(r=>getRowVal(r,axD)))];
+    if(axD==='mes') dVals.sort((a,b)=>a-b);
+    else dVals.sort();
+
+    let datasets;
+    if(axD === 'ninguno'){
+      // Single bar per X value — cumplimiento global sin desglose
+      datasets = [{
+        label: '% Cumplimiento',
+        data: xVals.map(xv => {
+          const sub = rows.filter(r => getRowVal(r,axX)==xv);
+          const p = sub.reduce((s,r)=>s+r.programado,0);
+          const e = sub.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+          return p>0 ? Math.round(e/p*100) : 0;
+        }),
+        backgroundColor: xVals.map(xv => {
+          const sub = rows.filter(r => getRowVal(r,axX)==xv);
+          const p = sub.reduce((s,r)=>s+r.programado,0);
+          const e = sub.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+          const pct = p>0 ? Math.round(e/p*100) : 0;
+          return pct>=80?'#2dd4a0bb':pct>=50?'#f5a52abb':'#f26b6bbb';
+        }),
+        borderRadius: 4,
+      }];
+    } else {
+      datasets = dVals.map((dv,i) => ({
+        label: getLabel(axD, dv),
+        data:  xVals.map(xv => calcPct(rows, xv, dv)),
+        backgroundColor: PALETTE[i % PALETTE.length] + 'bb',
+        borderRadius: 4,
+      }));
+    }
+
+    destroyChart(chartId);
+    chartRegistry[chartId] = new Chart(canvas, {
+      type: 'bar',
+      data: { labels: xVals.map(v=>getLabel(axX,v)), datasets },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: axD !== 'ninguno' && dVals.length > 1, position:'bottom', labels:{color:'#7b82a0',font:{size:9},boxWidth:9,padding:7} },
+          tooltip: {
+            mode:'index', intersect:false,
+            callbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.parsed.y}%` }
+          },
+        },
+        scales: {
+          x: { ticks:{color:'#7b82a0',font:{size:9},maxRotation:30}, grid:{color:'rgba(255,255,255,0.04)'} },
+          y: {
+            ticks: { color:'#7b82a0', font:{size:9}, callback: v => v+'%' },
+            grid:  { color:'rgba(255,255,255,0.04)' },
+            min: 0, max: 100,
+            // Línea de referencia al 80%
+          },
+        },
+        // Plugin inline: línea de meta al 80%
+        plugins2: {},
+      },
+      plugins: [{
+        id: 'metaLine',
+        afterDraw(chart){
+          const {ctx, chartArea:{left,right}, scales:{y}} = chart;
+          const yPos = y.getPixelForValue(80);
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(left, yPos);
+          ctx.lineTo(right, yPos);
+          ctx.strokeStyle = 'rgba(245,165,42,0.6)';
+          ctx.setLineDash([5,4]);
+          ctx.lineWidth = 1.5;
+          ctx.stroke();
+          ctx.fillStyle = '#f5a52a';
+          ctx.font = '9px DM Sans, sans-serif';
+          ctx.fillText('Meta 80%', right - 48, yPos - 4);
+          ctx.restore();
+        }
+      }],
+    });
+  });
+
+  // Render global KPI bar
+  renderIDSGlobal();
+
+  // Pills
+  const allRowsIDS = Object.values(IDS_DATA).flat().filter(Boolean);
+  const tp = allRowsIDS.reduce((s,r)=>s+r.programado,0);
+  const te = allRowsIDS.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+  const pct = tp>0?Math.round(te/tp*100):0;
+  document.getElementById('pills-ids').innerHTML =
+    `<span class="pill ${pillColor(pct)}">${pct}% cumplimiento IDS</span>`+
+    `<span class="pill blue">${te}/${tp} inspecciones</span>`;
+}
+
+/* ── CAPACITACIONES ── */
+function renderCapacitaciones(){
+  const anio=getDataAnio();
+  const d=DATA[anio].capacitaciones;
+  let html='';
+  UNIDADES.forEach(u=>{
+    const id='ch-cap-'+u.id;
+    destroyChart(id);
+    const rows=d[u.id];
+    const totalProg=rows.reduce((s,r)=>s+r.prog,0);
+    const totalEjec=rows.reduce((s,r)=>s+r.ejec,0);
+    const pct=totalProg>0?Math.round(totalEjec/totalProg*100):0;
+    html+=`<div class="card">
+      <span class="unit-lbl ${u.cls}">${u.label}</span>
+      <div class="ct">Cumplimiento de capacitaciones</div>
+      <div class="cs">Programadas vs Ejecutadas — ${pct}% de cumplimiento</div>
+      <div class="prog-wrap">
+        ${rows.map(r=>{
+          const p=r.prog>0?Math.round(r.ejec/r.prog*100):0;
+          return `<div class="prog-row">
+            <span class="prog-lbl" title="${r.tema}">${r.tema}</span>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${p}%;background:${progColor(p)}"></div></div>
+            <span class="prog-pct">${p}%</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="position:relative;height:170px;margin-top:8px"><canvas id="${id}" role="img" aria-label="Capacitaciones ${u.label}"></canvas></div>
+    </div>`;
+  });
+  document.getElementById('charts-cap').innerHTML=html;
+
+  // Pills
+  let totProg=0,totEjec=0;
+  UNIDADES.forEach(u=>{(DATA[anio]||DATA[2025]).capacitaciones[u.id].forEach(r=>{totProg+=r.prog;totEjec+=r.ejec;});});
+  const pctTotal=totProg>0?Math.round(totEjec/totProg*100):0;
+  document.getElementById('pills-cap').innerHTML=
+    `<span class="pill ${pillColor(pctTotal)}">${pctTotal}% cumplimiento</span>`+
+    `<span class="pill blue">${totEjec}/${totProg} capacitaciones</span>`;
+
+  UNIDADES.forEach(u=>{
+    const id='ch-cap-'+u.id;
+    const rows=d[u.id];
+    chartRegistry[id]=new Chart(document.getElementById(id),{
+      type:'bar',
+      data:{labels:rows.map(r=>r.tema.length>14?r.tema.substring(0,13)+'…':r.tema),datasets:[
+        {label:'Programadas',data:rows.map(r=>r.prog),backgroundColor:'rgba(123,130,160,0.4)',borderRadius:3},
+        {label:'Ejecutadas',data:rows.map(r=>r.ejec),backgroundColor:u.color+'aa',borderRadius:3},
+      ]},
+      options:{responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},
+        scales:{
+          x:{ticks:{color:'#7b82a0',font:{size:8},maxRotation:35},grid:{color:'rgba(255,255,255,0.04)'}},
+          y:{ticks:{color:'#7b82a0',font:{size:9},stepSize:5},grid:{color:'rgba(255,255,255,0.04)'},min:0},
+        }
+      }
+    });
+  });
+}
+
+const SGSSO_CASMA_FALLBACK  = [{"lineamiento": "I. Compromiso e Involucramiento", "avance": 0.575, "fecha": "2026-05-11"}, {"lineamiento": "II. Política de SST", "avance": 0.519230769230769, "fecha": "2026-05-11"}, {"lineamiento": "III. Planeamiento y Aplicación", "avance": 0.529411764705882, "fecha": "2026-05-11"}, {"lineamiento": "IV. Implementación y operación", "avance": 0.61, "fecha": "2026-05-11"}, {"lineamiento": "V. Evaluación Normativa", "avance": 0.625, "fecha": "2026-05-11"}, {"lineamiento": "VI. Verificación", "avance": 0.375, "fecha": "2026-05-11"}, {"lineamiento": "VII. Control de información y documentos", "avance": 0.886363636363636, "fecha": "2026-05-11"}, {"lineamiento": "VIII. Revisión por la dirección", "avance": 0.166666666666667, "fecha": "2026-05-11"}, {"lineamiento": "I. Compromiso e Involucramiento", "avance": 0.575, "fecha": "2026-05-04"}, {"lineamiento": "II. Política de SST", "avance": 0.519230769230769, "fecha": "2026-05-04"}, {"lineamiento": "III. Planeamiento y Aplicación", "avance": 0.529411764705882, "fecha": "2026-05-04"}, {"lineamiento": "IV. Implementación y operación", "avance": 0.61, "fecha": "2026-05-04"}, {"lineamiento": "V. Evaluación Normativa", "avance": 0.625, "fecha": "2026-05-04"}, {"lineamiento": "VI. Verificación", "avance": 0.375, "fecha": "2026-05-04"}, {"lineamiento": "VII. Control de información y documentos", "avance": 0.886363636363636, "fecha": "2026-05-04"}, {"lineamiento": "VIII. Revisión por la dirección", "avance": 0.166666666666667, "fecha": "2026-05-04"}];
+const SGSSO_PLANTA_FALLBACK = [{"lineamiento": "I. Compromiso e Involucramiento", "avance": 0.805555555555556, "fecha": "2026-05-11"}, {"lineamiento": "II. Política de SST", "avance": 0.692307692307692, "fecha": "2026-05-11"}, {"lineamiento": "III. Planeamiento y Aplicación", "avance": 0.352941176470588, "fecha": "2026-05-11"}, {"lineamiento": "IV. Implementación y operación", "avance": 0.52, "fecha": "2026-05-11"}, {"lineamiento": "V. Evaluación Normativa", "avance": 0.0, "fecha": "2026-05-11"}, {"lineamiento": "VI. Verificación", "avance": 0.494623655913978, "fecha": "2026-05-11"}, {"lineamiento": "VII. Control de información y documentos", "avance": 0.318181818181818, "fecha": "2026-05-11"}, {"lineamiento": "VIII. Revisión por la dirección", "avance": 0.333333333333333, "fecha": "2026-05-11"}, {"lineamiento": "I. Compromiso e Involucramiento", "avance": 0.805555555555556, "fecha": "2026-05-04"}, {"lineamiento": "II. Política de SST", "avance": 0.692307692307692, "fecha": "2026-05-04"}, {"lineamiento": "III. Planeamiento y Aplicación", "avance": 0.352941176470588, "fecha": "2026-05-04"}, {"lineamiento": "IV. Implementación y operación", "avance": 0.52, "fecha": "2026-05-04"}, {"lineamiento": "V. Evaluación Normativa", "avance": 0.0, "fecha": "2026-05-04"}, {"lineamiento": "VI. Verificación", "avance": 0.494623655913978, "fecha": "2026-05-04"}, {"lineamiento": "VII. Control de información y documentos", "avance": 0.318181818181818, "fecha": "2026-05-04"}, {"lineamiento": "VIII. Revisión por la dirección", "avance": 0.333333333333333, "fecha": "2026-05-04"}];
+
+const SGSSO_URLS = {
+  casma:     'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/Sistema_Casma.json',
+  beneficio: 'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/Sistema_Planta.json',
+};
+let SGSSO_DATA = { casma: null, beneficio: null };
+// Filtro de fecha INDEPENDIENTE por unidad
+let sgFilters = { casma: null, beneficio: null };
+
+function excelToYMD(serial){
+  const d = new Date(Math.round((serial - 25569) * 86400 * 1000));
+  const y = d.getUTCFullYear(), m = String(d.getUTCMonth()+1).padStart(2,'0'), dd = String(d.getUTCDate()).padStart(2,'0');
+  return `${y}-${m}-${dd}`;
+}
+function ymdToLabel(ymd){
+  const [y,m,d] = ymd.split('-');
+  const MN = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  return d && d!=='01' ? `${d}/${MN[+m]}/${y.slice(2)}` : `${MN[+m]} ${y}`;
+}
+
+async function loadSGSSO(){
+  await Promise.allSettled(
+    Object.entries(SGSSO_URLS).map(async ([key, url]) => {
+      if(!url) return;
+      const r = await fetch(url);
+      if(!r.ok) throw new Error('HTTP ' + r.status);
+      const json = await r.json();
+      // Formato unificado: Lineamiento / Calificación / Fecha (serial Excel)
+      // Soporta claves tabla_Sistema_Casma o tabla_Sistema_Planta
+      const raw = json['tabla_Sistema_Casma'] || json['tabla_Sistema_Planta'] || json['data'] || [];
+      const seen = {};
+      raw.filter(r => !String(r['Lineamiento']||'').toUpperCase().includes('PROMEDIO'))
+        .forEach(r => { seen[r['Lineamiento']+'|'+r['Fecha']] = r; });
+      SGSSO_DATA[key] = Object.values(seen).map(r => ({
+        lineamiento: String(r['Lineamiento']||'').trim(),
+        avance:      parseFloat(r['Calificación']||0),
+        fecha:       excelToYMD(r['Fecha']),
+      }));
+    })
+  );
+  if(!SGSSO_DATA.casma)     SGSSO_DATA.casma     = SGSSO_CASMA_FALLBACK;
+  if(!SGSSO_DATA.beneficio) SGSSO_DATA.beneficio = SGSSO_PLANTA_FALLBACK;
+  renderSGSSO();
+}
+
+/* ── SGSSO ── */
+function renderSGSSO(){
+  if(!SGSSO_DATA.casma)     SGSSO_DATA.casma     = SGSSO_CASMA_FALLBACK;
+  if(!SGSSO_DATA.beneficio) SGSSO_DATA.beneficio = SGSSO_PLANTA_FALLBACK;
+
+  // Fechas disponibles por unidad
+  function getFechas(unitId){
+    return [...new Set((SGSSO_DATA[unitId]||[]).map(r=>r.fecha))].sort();
+  }
+  // Inicializar filtros con última fecha disponible
+  ['casma','beneficio'].forEach(uid => {
+    const fechas = getFechas(uid);
+    if(!sgFilters[uid] || !fechas.includes(sgFilters[uid]))
+      sgFilters[uid] = fechas[fechas.length-1] || null;
+  });
+
+  // Global KPI — promedio de la última fecha de cada unidad
+  const allPcts = ['casma','beneficio'].map(uid => {
+    const rows = (SGSSO_DATA[uid]||[]).filter(r=>r.fecha===sgFilters[uid]);
+    return rows.length ? rows.reduce((s,r)=>s+r.avance,0)/rows.length : null;
+  }).filter(v=>v!==null);
+  const pctGlobal = allPcts.length ? Math.round(allPcts.reduce((s,v)=>s+v,0)/allPcts.length*100) : 0;
+  const gColor  = pctGlobal>=80?'#2dd4a0':pctGlobal>=50?'#f5a52a':'#f26b6b';
+  const gBg     = pctGlobal>=80?'rgba(45,212,160,0.08)':pctGlobal>=50?'rgba(245,165,42,0.08)':'rgba(242,107,107,0.08)';
+  const gBorder = pctGlobal>=80?'rgba(45,212,160,0.3)':pctGlobal>=50?'rgba(245,165,42,0.3)':'rgba(242,107,107,0.3)';
+
+  const globalPanel = `
+    <div style="background:${gBg};border:1px solid ${gBorder};border-radius:12px;padding:12px 18px;margin-bottom:12px;display:flex;align-items:center;gap:20px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:10px;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Implementación SGSSO · Promedio global</div>
+        <span style="font-size:38px;font-weight:600;font-family:var(--mono);color:${gColor};line-height:1">${pctGlobal}%</span>
+      </div>
+      <div style="flex:1;min-width:200px">
+        <div style="height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:visible;position:relative">
+          <div style="height:100%;width:${pctGlobal}%;background:${gColor};border-radius:4px;transition:width .6s"></div>
+          <div style="position:absolute;left:80%;top:-4px;width:1px;height:16px;background:rgba(245,165,42,0.6)"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span style="font-size:10px;color:var(--tx3)">0%</span>
+          <span style="font-size:10px;color:#f5a52a">Meta 80%</span>
+          <span style="font-size:10px;color:var(--tx3)">100%</span>
+        </div>
+      </div>
+    </div>`;
+
+  const unitsConfig = [
+    {id:'casma',     label:'Minera Casma',    cls:'ul-casma',    color:'#4f8ef7'},
+    {id:'beneficio', label:'Planta Beneficio', cls:'ul-beneficio',color:'#2dd4a0'},
+  ];
+
+  function buildSGCard(u){
+    const cid = 'ch-sg-' + u.id;
+    destroyChart(cid);
+    const fechas   = getFechas(u.id);
+    const fechaSel = sgFilters[u.id];
+    const rows     = (SGSSO_DATA[u.id]||[]).filter(r=>r.fecha===fechaSel);
+
+    const fechaChips = fechas.map(f =>
+      `<button class="filter-chip ${fechaSel===f?'active':''}" onclick="setSGFecha('${u.id}','${f}')"
+        style="font-size:10px;padding:3px 8px">${ymdToLabel(f)}</button>`
+    ).join('');
+
+    if(!rows.length) return `<div class="card">
+      <span class="unit-lbl ${u.cls}">${u.label}</span>
+      <div style="height:340px;display:flex;align-items:center;justify-content:center;color:var(--tx3);font-size:12px">Sin datos</div>
+    </div>`;
+
+    const pct = Math.round(rows.reduce((s,r)=>s+r.avance,0)/rows.length*100);
+    const pColor = progColor(pct);
+
+    return `<div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:8px">
+        <span class="unit-lbl ${u.cls}" style="margin-bottom:0">${u.label}</span>
+        <span class="badge ${pct>=80?'bg':pct>=50?'ba':'br'}" style="font-size:12px;padding:3px 10px">${pct}%</span>
+      </div>
+      <div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:12px">${fechaChips}</div>
+      <div class="prog-wrap">
+        ${rows.map(r=>{
+          const p = Math.round(r.avance*100);
+          const lbl = r.lineamiento.length>28?r.lineamiento.substring(0,27)+'…':r.lineamiento;
+          return `<div class="prog-row">
+            <span class="prog-lbl" title="${r.lineamiento}" style="width:160px">${lbl}</span>
+            <div class="prog-bar-bg"><div class="prog-bar-fill" style="width:${p}%;background:${progColor(p)}"></div></div>
+            <span class="prog-pct">${p}%</span>
+          </div>`;
+        }).join('')}
+      </div>
+      <div style="position:relative;height:260px;margin-top:14px"><canvas id="${cid}"></canvas></div>
+    </div>`;
+  }
+
+  document.getElementById('charts-sg').innerHTML = globalPanel + `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;width:100%">
+      ${unitsConfig.map(u=>buildSGCard(u)).join('')}
+    </div>`;
+
+  // Render radar charts
+  unitsConfig.forEach(u => {
+    const rows = (SGSSO_DATA[u.id]||[]).filter(r=>r.fecha===sgFilters[u.id]);
+    if(!rows.length) return;
+    const cid = 'ch-sg-' + u.id;
+    const canvas = document.getElementById(cid);
+    if(!canvas) return;
+    destroyChart(cid);
+    const labels = rows.map(r => r.lineamiento.split('.')[0].trim());
+    chartRegistry[cid] = new Chart(canvas, {
+      type:'radar',
+      data:{ labels, datasets:[{
+        label:'Avance %',
+        data: rows.map(r=>Math.round(r.avance*100)),
+        backgroundColor: u.color+'22', borderColor: u.color,
+        borderWidth:1.5, pointBackgroundColor:u.color, pointRadius:3,
+      }]},
+      options:{
+        responsive:true, maintainAspectRatio:false,
+        plugins:{legend:{display:false}},
+        scales:{r:{
+          ticks:{color:'#7b82a0',font:{size:8},backdropColor:'transparent',stepSize:25},
+          grid:{color:'rgba(255,255,255,0.06)'},
+          pointLabels:{color:'#7b82a0',font:{size:8}},
+          min:0, max:100,
+        }}
+      }
+    });
+  });
+
+  // Pills
+  document.getElementById('pills-sg').innerHTML =
+    `<span class="pill ${pillColor(pctGlobal)}">${pctGlobal}% implementación</span>`;
+}
+
+function setSGFecha(unitId, fecha){
+  sgFilters[unitId] = fecha;
+  renderSGSSO();
+}
+
+
+function renderAccordion(id){
+  if(id==='acc-hh'){
+    const hasHH = Object.values(HH_DATA).some(v=>v!==null);
+    hasHH ? renderHH() : loadHH();
+  }
+  else if(id==='acc-acc') renderAccidentes();
+  else if(id==='acc-ids') {
+    // Si ya hay datos cargados renderiza directo, sino hace fetch
+    const hasData = Object.values(IDS_DATA).some(v=>v!==null);
+    hasData ? renderIDS() : loadIDS();
+  }
+  else if(id==='acc-cap') renderCapacitaciones();
+  else if(id==='acc-sg'){
+    const hasSG = Object.values(SGSSO_DATA).some(v=>v!==null);
+    hasSG ? renderSGSSO() : loadSGSSO();
+  }
+}
+
+function renderAll(){
+  try { updatePeriodLabel(); } catch(e){ console.warn('period:', e); }
+  try { renderKPIs(); } catch(e){ console.warn('kpis:', e); }
+  // Re-render only open accordions
+  ['acc-hh','acc-acc','acc-ids','acc-cap','acc-sg'].forEach(id=>{
+    if(document.getElementById(id).classList.contains('open')){
+      try { renderAccordion(id); } catch(e){ console.warn('accordion '+id+':', e); }
+    }
+  });
+  // Refresh pills for all
+  try { refreshAllPills(); } catch(e){ console.warn('pills:', e); }
+}
+
+
+function refreshAllPills(){
+  const anio=getDataAnio();
+  const d=DATA[anio] || DATA[2025];
+  // HH pills — datos reales
+  {
+    let pillsHtml='';
+    [{id:'casma',l:'Casma'},{id:'beneficio',l:'Beneficio'}].forEach(u=>{
+      if(!HH_DATA[u.id]) return;
+      const total=HH_DATA[u.id].reduce((s,r)=>s+r.hh,0);
+      pillsHtml+=`<span class="pill blue">${u.l}: ${(total/1000).toFixed(1)}K HH</span>`;
+    });
+    if(pillsHtml) document.getElementById('pills-hh').innerHTML=pillsHtml;
+  }
+  // Accidents pills — real Casma data
+  const _ar=filterCasma(accFilters.guardia,accFilters.turno);
+  document.getElementById('pills-acc').innerHTML=
+    `<span class="pill amber">Leves: ${sumField(_ar,'leve')}</span>`+
+    `<span class="pill red">Incap: ${sumField(_ar,'incap')}</span>`+
+    (sumField(_ar,'ambiental')>0?`<span class="pill green">Amb: ${sumField(_ar,'ambiental')}</span>`:'')+
+    `<span class="pill blue">Incidentes: ${sumField(_ar,'incidente')}</span>`;
+  // IDS pills — datos reales desde GitHub
+  {
+    const allIDS = IDS_DATA.beneficio || [];
+    const tp = allIDS.reduce((s,r)=>s+r.programado,0);
+    const te = allIDS.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+    const pct = tp>0?Math.round(te/tp*100):0;
+    document.getElementById('pills-ids').innerHTML =
+      `<span class="pill ${pillColor(pct)}">${pct}% cumplimiento IDS</span>`+
+      `<span class="pill blue">${te}/${tp} inspecciones</span>`;
+  }
+  // Cap pills — from mock data (safe access)
+  try {
+    let totProg=0,totEjec=0;
+    const dSafe = DATA[getDataAnio()] || DATA[2025];
+    UNIDADES.forEach(u=>{
+      if(dSafe.capacitaciones[u.id]) dSafe.capacitaciones[u.id].forEach(r=>{totProg+=r.prog;totEjec+=r.ejec;});
+    });
+    const pctTotal=totProg>0?Math.round(totEjec/totProg*100):0;
+    document.getElementById('pills-cap').innerHTML=
+      `<span class="pill ${pillColor(pctTotal)}">${pctTotal}% cumplimiento</span>`+
+      `<span class="pill blue">${totEjec}/${totProg} capacitaciones</span>`;
+    // SGSSO pills
+    let sgSum=0,sgCnt=0;
+    UNIDADES.forEach(u=>{
+      if(dSafe.sgsso[u.id]) dSafe.sgsso[u.id].forEach(r=>{sgSum+=r.avance;sgCnt++;});
+    });
+    const avgTotal=sgCnt>0?Math.round(sgSum/sgCnt):0;
+    document.getElementById('pills-sg').innerHTML=
+      `<span class="pill ${pillColor(avgTotal)}">${avgTotal}% implementación promedio</span>`;
+  } catch(e){ console.warn('pills cap/sg:', e); }
+  // SGSSO pills override if real data available
+  try {
+    const allSG = Object.values(SGSSO_DATA).flat().filter(Boolean);
+    if(allSG.length){
+      const meses = [...new Set(allSG.map(r=>r.mes))].sort((a,b)=>a-b);
+      const lastM = meses[meses.length-1];
+      const rowsM = allSG.filter(r=>r.mes===lastM);
+      const pctSG = rowsM.length ? Math.round(rowsM.reduce((s,r)=>s+r.avance,0)/rowsM.length*100) : 0;
+      const MN = ['','Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+      document.getElementById('pills-sg').innerHTML =
+        `<span class="pill ${pillColor(pctSG)}">${pctSG}% implementación</span>`+
+        `<span class="pill blue">${MN[lastM]}</span>`;
+    }
+  } catch(e){ console.warn('pills sg real:', e); }
+}
+
+// Init — carga datos desde GitHub y luego renderiza
+// Para desarrollo local sin GitHub, comenta loadAllData() y descomenta renderAll()
+loadAllData();
+// renderAll(); // ← usar esto para pruebas sin conexión
+</script>
+</body>
+</html>

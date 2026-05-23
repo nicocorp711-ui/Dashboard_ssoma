@@ -3,7 +3,7 @@
     "unidad": "Planta Beneficio",
     "tabla": "IDS_PLANTA",
     "hoja": "Historico",
-    "generado": "2026-05-13T10:07:15Z",
+    "generado": "2026-05-23T09:04:37Z",
     "total": 172
   },
   "ids": [
@@ -40,7 +40,7 @@
       "CARGO": "Jefe de Guardia",
       "GUARDIA": "C",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 1,
       "EJECUTADO": 2
     },
     {
@@ -52,7 +52,7 @@
       "CARGO": "Jefe de Guardia",
       "GUARDIA": "B",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 1,
       "EJECUTADO": 2
     },
     {
@@ -64,7 +64,7 @@
       "CARGO": "Jefe de Guardia",
       "GUARDIA": "A",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 1,
       "EJECUTADO": 0
     },
     {
@@ -101,7 +101,7 @@
       "GUARDIA": "C",
       "Indicador": "INSPECCION",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -112,7 +112,7 @@
       "CARGO": "Jefe de Metalurgia",
       "GUARDIA": "B",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 0,
       "EJECUTADO": 0
     },
     {
@@ -125,7 +125,7 @@
       "GUARDIA": "B",
       "Indicador": "INSPECCION",
       "PROGRAMADO": 2,
-      "EJECUTADO": 1
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -161,7 +161,7 @@
       "GUARDIA": "B",
       "Indicador": "INSPECCION",
       "PROGRAMADO": 2,
-      "EJECUTADO": 1
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -173,7 +173,7 @@
       "GUARDIA": "C",
       "Indicador": "INSPECCION",
       "PROGRAMADO": 2,
-      "EJECUTADO": 1
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -185,7 +185,7 @@
       "GUARDIA": "A",
       "Indicador": "INSPECCION",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -208,7 +208,7 @@
       "CARGO": "Supervisor de Laboratorio",
       "GUARDIA": "A",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 1,
       "EJECUTADO": 0
     },
     {
@@ -220,7 +220,7 @@
       "CARGO": "Supervisor de Laboratorio",
       "GUARDIA": "A",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 1,
       "EJECUTADO": 0
     },
     {
@@ -232,7 +232,7 @@
       "CARGO": "Supervisor de Laboratorio",
       "GUARDIA": "SG",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 1,
       "EJECUTADO": 2
     },
     {
@@ -244,8 +244,8 @@
       "CARGO": "Supervisor de Obras Civiles",
       "GUARDIA": "C",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "PROGRAMADO": 1,
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -256,7 +256,7 @@
       "CARGO": "Supervisor Ssoma",
       "GUARDIA": "A",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 1,
       "EJECUTADO": 0
     },
     {
@@ -268,7 +268,7 @@
       "CARGO": "Supervisor Ssoma",
       "GUARDIA": "SG",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 1,
       "EJECUTADO": 0
     },
     {
@@ -280,8 +280,8 @@
       "CARGO": "Supervisor Jr Control de Procesos",
       "GUARDIA": "C",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
-      "EJECUTADO": 1
+      "PROGRAMADO": 1,
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -292,8 +292,8 @@
       "CARGO": "Supervisor Jr Control de Procesos",
       "GUARDIA": "B",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "PROGRAMADO": 1,
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -304,8 +304,8 @@
       "CARGO": "Supervisor de Obras Civiles",
       "GUARDIA": "A",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "PROGRAMADO": 1,
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -316,7 +316,7 @@
       "CARGO": "Supervisor Ssoma",
       "GUARDIA": "B",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
+      "PROGRAMADO": 1,
       "EJECUTADO": 1
     },
     {
@@ -328,8 +328,8 @@
       "CARGO": "Supervisor Control de Procesos",
       "GUARDIA": "A",
       "Indicador": "INSPECCION",
-      "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "PROGRAMADO": 1,
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -377,7 +377,7 @@
       "GUARDIA": "B",
       "Indicador": "DDS",
       "PROGRAMADO": 3,
-      "EJECUTADO": 2
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -425,7 +425,7 @@
       "GUARDIA": "C",
       "Indicador": "DDS",
       "PROGRAMADO": 3,
-      "EJECUTADO": 0
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -436,7 +436,7 @@
       "CARGO": "Jefe de Metalurgia",
       "GUARDIA": "B",
       "Indicador": "DDS",
-      "PROGRAMADO": 3,
+      "PROGRAMADO": 0,
       "EJECUTADO": 0
     },
     {
@@ -449,7 +449,7 @@
       "GUARDIA": "B",
       "Indicador": "DDS",
       "PROGRAMADO": 3,
-      "EJECUTADO": 1
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -461,7 +461,7 @@
       "GUARDIA": "C",
       "Indicador": "DDS",
       "PROGRAMADO": 3,
-      "EJECUTADO": 1
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -473,7 +473,7 @@
       "GUARDIA": "B",
       "Indicador": "DDS",
       "PROGRAMADO": 3,
-      "EJECUTADO": 0
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -497,7 +497,7 @@
       "GUARDIA": "C",
       "Indicador": "DDS",
       "PROGRAMADO": 3,
-      "EJECUTADO": 1
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -521,7 +521,7 @@
       "GUARDIA": "B",
       "Indicador": "DDS",
       "PROGRAMADO": 3,
-      "EJECUTADO": 0
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -533,7 +533,7 @@
       "GUARDIA": "A",
       "Indicador": "DDS",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -557,7 +557,7 @@
       "GUARDIA": "SG",
       "Indicador": "DDS",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -569,7 +569,7 @@
       "GUARDIA": "C",
       "Indicador": "DDS",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -593,7 +593,7 @@
       "GUARDIA": "SG",
       "Indicador": "DDS",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -629,7 +629,7 @@
       "GUARDIA": "A",
       "Indicador": "DDS",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -653,7 +653,7 @@
       "GUARDIA": "A",
       "Indicador": "DDS",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -713,7 +713,7 @@
       "GUARDIA": "A",
       "Indicador": "CAPACITACION SSO",
       "PROGRAMADO": 1,
-      "EJECUTADO": 0
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -760,7 +760,7 @@
       "CARGO": "Jefe de Metalurgia",
       "GUARDIA": "B",
       "Indicador": "CAPACITACION SSO",
-      "PROGRAMADO": 1,
+      "PROGRAMADO": 0,
       "EJECUTADO": 0
     },
     {
@@ -833,7 +833,7 @@
       "GUARDIA": "A",
       "Indicador": "CAPACITACION SSO",
       "PROGRAMADO": 1,
-      "EJECUTADO": 0
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -989,7 +989,7 @@
       "GUARDIA": "B",
       "Indicador": "RACs",
       "PROGRAMADO": 3,
-      "EJECUTADO": 0
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -1037,7 +1037,7 @@
       "GUARDIA": "A",
       "Indicador": "RACs",
       "PROGRAMADO": 3,
-      "EJECUTADO": 0
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -1073,7 +1073,7 @@
       "GUARDIA": "C",
       "Indicador": "RACs",
       "PROGRAMADO": 3,
-      "EJECUTADO": 0
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -1084,8 +1084,8 @@
       "CARGO": "Jefe de Metalurgia",
       "GUARDIA": "B",
       "Indicador": "RACs",
-      "PROGRAMADO": 3,
-      "EJECUTADO": 2
+      "PROGRAMADO": 0,
+      "EJECUTADO": 0
     },
     {
       "Mes": 5,
@@ -1121,7 +1121,7 @@
       "GUARDIA": "B",
       "Indicador": "RACs",
       "PROGRAMADO": 3,
-      "EJECUTADO": 0
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -1157,7 +1157,7 @@
       "GUARDIA": "A",
       "Indicador": "RACs",
       "PROGRAMADO": 3,
-      "EJECUTADO": 0
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -1181,7 +1181,7 @@
       "GUARDIA": "A",
       "Indicador": "RACs",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -1193,7 +1193,7 @@
       "GUARDIA": "A",
       "Indicador": "RACs",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -1205,7 +1205,7 @@
       "GUARDIA": "SG",
       "Indicador": "RACs",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -1217,7 +1217,7 @@
       "GUARDIA": "C",
       "Indicador": "RACs",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 1
     },
     {
       "Mes": 5,
@@ -1229,7 +1229,7 @@
       "GUARDIA": "A",
       "Indicador": "RACs",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -1241,7 +1241,7 @@
       "GUARDIA": "SG",
       "Indicador": "RACs",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -1265,7 +1265,7 @@
       "GUARDIA": "B",
       "Indicador": "RACs",
       "PROGRAMADO": 2,
-      "EJECUTADO": 1
+      "EJECUTADO": 2
     },
     {
       "Mes": 5,
@@ -1277,7 +1277,7 @@
       "GUARDIA": "A",
       "Indicador": "RACs",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 3
     },
     {
       "Mes": 5,
@@ -1301,7 +1301,7 @@
       "GUARDIA": "A",
       "Indicador": "RACs",
       "PROGRAMADO": 2,
-      "EJECUTADO": 0
+      "EJECUTADO": 2
     },
     {
       "Mes": 4,

@@ -140,6 +140,122 @@ body{font-family:var(--font);background:var(--bg);color:var(--tx);min-height:100
 
 @media(max-width:900px){.cg3,.ids-grid{grid-template-columns:1fr}}
 @media(max-width:600px){.main,.hdr{padding-left:14px;padding-right:14px}}
+
+/* ── BOTÓN PDF ── */
+.btn-pdf{display:inline-flex;align-items:center;gap:6px;background:var(--red2);border:1px solid rgba(242,107,107,0.35);color:#f26b6b;font-family:var(--font);font-size:12px;font-weight:500;padding:6px 14px;border-radius:20px;cursor:pointer;transition:all .2s}
+.btn-pdf:hover{background:rgba(242,107,107,0.2);border-color:rgba(242,107,107,0.6)}
+.btn-pdf svg{flex-shrink:0}
+
+/* ── PRINT STYLES ── */
+@media print{
+  *{-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important;color-adjust:exact!important}
+  body{background:#0d1117!important;color:#dde1ed!important;font-size:11px!important}
+  .hdr,.top-bar,.acc-chevron,.filter-row,.filter-bar,.btn-pdf,.spill,.period,.fsel,.fl{display:none!important}
+  .filter-row,.filter-chip{display:none!important}
+  .sec{display:none!important}
+
+  /* ── PÁGINA: cada acordeón = 1 hoja ── */
+  @page{size:A4 landscape;margin:0}
+
+  .main{
+    padding:0!important;
+    margin:0!important;
+    width:100%!important;
+  }
+
+  /* KPIs generales: primera página, compacta */
+  #kpi-general{
+    display:grid!important;
+    grid-template-columns:repeat(4,1fr)!important;
+    gap:6px!important;
+    padding:8mm 10mm!important;
+    box-sizing:border-box!important;
+    page-break-after:always!important;
+    break-after:page!important;
+    min-height:0!important;
+  }
+
+  /* Cada acordeón = exactamente 1 hoja A4 landscape */
+  .accordion{
+    display:block!important;
+    width:297mm!important;
+    height:210mm!important;
+    box-sizing:border-box!important;
+    padding:5mm 7mm!important;
+    margin:0!important;
+    page-break-before:always!important;
+    break-before:page!important;
+    page-break-after:always!important;
+    break-after:page!important;
+    page-break-inside:avoid!important;
+    break-inside:avoid!important;
+    overflow:hidden!important;
+    background:var(--sf)!important;
+    border:none!important;
+    border-radius:0!important;
+    position:relative!important;
+  }
+
+  /* Header del acordeón compacto */
+  .acc-header{
+    padding:4px 0 6px 0!important;
+    margin-bottom:4px!important;
+    border-bottom:1px solid rgba(255,255,255,0.08)!important;
+    border-radius:0!important;
+    background:transparent!important;
+  }
+  .acc-title{font-size:13px!important;font-weight:600!important}
+  .acc-sub{font-size:9px!important}
+  .acc-pills{display:flex!important;gap:4px!important}
+  .pill{font-size:8px!important;padding:2px 6px!important}
+
+  /* Body del acordeón: ocupa el resto de la hoja */
+  .acc-body{
+    display:block!important;
+    max-height:none!important;
+    overflow:hidden!important;
+    padding:4px 0 0 0!important;
+    height:calc(210mm - 28mm)!important;
+    box-sizing:border-box!important;
+  }
+
+  /* Cards lado a lado */
+  .card{
+    break-inside:avoid!important;
+    page-break-inside:avoid!important;
+    margin-bottom:5px!important;
+  }
+  .col-2{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+    height:100%!important;
+  }
+
+  /* IDS grid */
+  .ids-grid,.cg3{
+    display:grid!important;
+    grid-template-columns:1fr 1fr!important;
+    gap:8px!important;
+  }
+
+  /* Charts: imagen snapshot ajustada al contenedor */
+  canvas{display:none!important}
+  img.pdf-chart-snapshot{
+    display:block!important;
+    width:100%!important;
+    height:auto!important;
+    max-height:120mm!important;
+    object-fit:contain!important;
+  }
+
+  /* Tablas de totales */
+  table{font-size:8px!important}
+  td,th{padding:3px 5px!important}
+
+  /* KPI blocks compactos */
+  .krow{display:grid!important;grid-template-columns:repeat(4,1fr)!important;gap:6px!important}
+}
 </style>
 </head>
 <body>
@@ -155,6 +271,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--tx);min-height:100
   </div>
   <div class="hdr-right">
     <div class="spill"><span class="sdot ok" id="load-dot"></span><span id="slbl">Actualizado hoy</span></div>
+    <button class="btn-pdf" onclick="exportarPDF()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      Exportar PDF
+    </button>
   </div>
 </header>
 
@@ -186,8 +306,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--tx);min-height:100
     <div class="acc-header" onclick="toggleAcc('acc-hh')">
       <div class="acc-icon" style="background:var(--blu2)">⏱️</div>
       <div class="acc-info">
-        <div class="acc-title">1. Horas Hombre</div>
-        <div class="acc-sub">Horas trabajadas y horas perdidas por unidad</div>
+        <div class="acc-title">1. Indicadores de Seguridad</div>
+        <div class="acc-sub">Horas trabajadas e índices de seguridad por unidad</div>
       </div>
       <div class="acc-pills" id="pills-hh"></div>
       <div class="acc-chevron">▼</div>
@@ -558,17 +678,17 @@ function parseHHRow(row){
     anio:         parseInt(hhField(row,'AÑO','anio') || 0),
     mes:          parseInt(hhField(row,'MESES','mes','MES') || 0),
     trabajadores: parseFloat(hhField(row,'Nº DE TRABAJADORES','TRABAJADORES') || 0),
-    hh:           parseFloat(hhField(row,'HORAS TRABAJADAS','HH') || 0),
+    hh:           parseFloat(hhField(row,'HORAS TRABAJADAS','HORAS \nTRABAJADAS','HH') || 0),
     IF:           parseFloat(hhField(row,'INDICE DE FRECUENCIA','IF') || 0),
     IS:           parseFloat(hhField(row,'INDICE DE SEVERIDAD','IS') || 0),
     IA:           parseFloat(hhField(row,'INDICE DE ACCIDENTABILIDAD','IA') || 0),
     metaIF:       parseFloat(hhField(row,'META IF') || 0),
     metaIS:       parseFloat(hhField(row,'META IS') || 0),
     metaIA:       parseFloat(hhField(row,'META IA') || 0),
-    incap:        parseFloat(hhField(row,'INCAPACITANTES') || 0),
+    incap:        parseFloat(hhField(row,'ACCIDENTE INCAPACITANTES','INCAPACITANTES') || 0),
     mortal:       parseFloat(hhField(row,'MORTAL') || 0),
     leves:        parseFloat(hhField(row,'ACCIDENTES LEVES') || 0),
-    diasPerdidos: parseFloat(hhField(row,'DÍAS PERDIDOS','DIAS PERDIDOS') || 0),
+    diasPerdidos: parseFloat(hhField(row,'DÍAS\nPERDIDOS','DÍAS PERDIDOS','DIAS PERDIDOS') || 0),
   };
 }
 
@@ -579,7 +699,7 @@ async function loadHH(){
       const r = await fetch(url);
       if(!r.ok) throw new Error('HTTP ' + r.status);
       const json = await r.json();
-      const rows = json['tabla_HH'] || json['hh'] || json['data'] || [];
+      const rows = json['tabla_HH_Casma'] || json['tabla_HH_Planta'] || json['tabla_HH'] || json['hh'] || json['data'] || [];
       HH_DATA[key] = rows.map(parseHHRow);
     })
   );
@@ -612,21 +732,28 @@ function buildKpiBlock(unitId, anioSel){
   const rows = (HH_DATA[unitId]||[]).filter(r=>r.anio===anioSel);
   if(!rows.length) return '';
   const last = rows[rows.length-1];
-  const mes  = MES_NOM_HH[last.mes]||last.mes;
-  const totalHH = rows.reduce((s,r)=>s+r.hh,0);
+  const totalHH    = rows.reduce((s,r)=>s+r.hh,0);
+  const totalIncap = rows.reduce((s,r)=>s+(parseFloat(r.incap)||0),0);
+  const totalDias  = rows.reduce((s,r)=>s+(parseFloat(r.diasPerdidos)||0),0);
+  // Indicadores acumulados del año (fórmula estándar minera)
+  const ifAnio = totalHH>0 ? (totalIncap * 1000000 / totalHH) : 0;
+  const isAnio = totalHH>0 ? (totalDias  * 1000000 / totalHH) : 0;
+  const iaAnio = (ifAnio * isAnio) / 1000;
+  const metaIF = last.metaIF;
+  const metaIS = last.metaIS;
+  const metaIA = last.metaIA;
   const col = (v,meta)=> v<=meta?'#2dd4a0':'#f26b6b';
   const kpi = (lbl,val,meta,c)=>`
     <div style="background:var(--sf3);border:1px solid var(--bd);border-radius:9px;padding:8px 14px;flex:1;min-width:100px">
       <div style="font-size:9px;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">${lbl}</div>
       <div style="font-size:22px;font-weight:600;font-family:var(--mono);color:${c};line-height:1">${val}</div>
-      ${meta?`<div style="font-size:9px;color:var(--tx3);margin-top:2px">Meta: ${meta}</div>`:''}
+      ${meta?`<div style="font-size:9px;color:var(--tx3);margin-top:2px">Meta: ${parseFloat(meta).toFixed(2)}</div>`:''}
     </div>`;
   return `
     <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px">
-      ${kpi('HH Acum. '+anioSel,(totalHH/1000).toFixed(1)+'K','','#4f8ef7')}
-      ${kpi('IF · '+mes,parseFloat(last.IF).toFixed(2),last.metaIF,col(last.IF,last.metaIF))}
-      ${kpi('IS · '+mes,parseFloat(last.IS).toFixed(2),last.metaIS,col(last.IS,last.metaIS))}
-      ${kpi('IA · '+mes,parseFloat(last.IA).toFixed(2),last.metaIA,col(last.IA,last.metaIA))}
+      ${kpi('IF Año '+anioSel, ifAnio.toFixed(2), metaIF, col(ifAnio, metaIF))}
+      ${kpi('IS Año '+anioSel, isAnio.toFixed(2), metaIS, col(isAnio, metaIS))}
+      ${kpi('IA Año '+anioSel, iaAnio.toFixed(2), metaIA, col(iaAnio, metaIA))}
     </div>`;
 }
 
@@ -758,7 +885,7 @@ function setHHAnio(a){
 // URL de los JSON en GitHub (raw content)
 const JSON_URLS = {
   casma:     'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/EVENTOS_CASMA.json',
-  beneficio: 'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/EVENTOS_BENEFICIO.json',
+  beneficio: 'https://raw.githubusercontent.com/nicocorp711-ui/Dashboard_ssoma/main/EVENTOS_PLANTA.json',
   // onoaga: pendiente
 };
 
@@ -782,7 +909,7 @@ async function loadAllData(){
   // Mapeo de nombres de campo del JSON real → nombres internos del dashboard
   const KEY_MAP = {
     casma:     'Incidentes_Casma',
-    beneficio: 'Incidentes_Beneficio',
+    beneficio: 'Incidentes_Planta',
   };
 
   // Normaliza una fila del JSON real al formato interno
@@ -1018,6 +1145,56 @@ function renderAccCols(){
         ${totAmb>0?`<span style="font-size:10px;color:var(--tx2)">Amb: <b style="color:#2dd4a0">${totAmb}</b></span>`:''}
       </div>`:''}
       <div style="position:relative;height:380px"><canvas id="${id}" role="img" aria-label="Accidentes ${u.label}"></canvas></div>
+      ${(()=>{
+        // Totales por columna (cada valor del eje X)
+        const colTotals = xVals.map(xv => {
+          const sub = rows.filter(r => matchDim(r, axX, xv));
+          if(axD === 'tipo'){
+            const byTipo = TIPOS.filter(tp => sumTipo(sub, tp.key) > 0).map(tp => ({
+              key: tp.key, label: tp.label, color: tp.color, val: sumTipo(sub, tp.key)
+            }));
+            return { label: getLabel(axX, xv), total: sumAll(sub), byTipo };
+          }
+          return { label: getLabel(axX, xv), total: sumAll(sub), byTipo: null };
+        }).filter(c => c.total > 0);
+
+        if(!colTotals.length) return '';
+        const grandTotal = colTotals.reduce((s,c) => s + c.total, 0);
+
+        const cells = colTotals.map(c => {
+          const tipoBadges = c.byTipo
+            ? c.byTipo.map(tp =>
+                `<span style="font-size:9px;color:${tp.color};white-space:nowrap">${tp.label.charAt(0).toUpperCase()}: <b>${tp.val}</b></span>`
+              ).join(' ')
+            : '';
+          return `<td style="padding:5px 8px;text-align:center;border-right:1px solid var(--bd);vertical-align:top">
+            <div style="font-size:13px;font-weight:700;font-family:var(--mono);color:var(--tx);line-height:1.2">${c.total}</div>
+            <div style="font-size:10px;color:var(--tx3);margin-bottom:2px">${c.label}</div>
+            ${tipoBadges ? `<div style="display:flex;flex-wrap:wrap;gap:3px;justify-content:center;margin-top:3px">${tipoBadges}</div>` : ''}
+          </td>`;
+        }).join('');
+
+        return `<div style="overflow-x:auto;margin-top:10px">
+          <table style="width:100%;border-collapse:collapse;background:var(--sf3);border:1px solid var(--bd);border-radius:8px;overflow:hidden;font-size:11px">
+            <thead>
+              <tr style="background:var(--sf2)">
+                <th style="padding:5px 8px;text-align:left;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);border-right:1px solid var(--bd);white-space:nowrap">Total / Col.</th>
+                ${colTotals.map(c => `<th style="padding:5px 8px;text-align:center;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3);border-right:1px solid var(--bd);white-space:nowrap">${c.label}</th>`).join('')}
+                <th style="padding:5px 8px;text-align:center;font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--tx3)">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="padding:5px 8px;font-size:9px;color:var(--tx3);border-right:1px solid var(--bd);white-space:nowrap">Eventos</td>
+                ${cells}
+                <td style="padding:5px 8px;text-align:center;vertical-align:middle">
+                  <div style="font-size:14px;font-weight:700;font-family:var(--mono);color:var(--tx)">${grandTotal}</div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>`;
+      })()}
     </div>`;
   });
 
@@ -1103,7 +1280,7 @@ async function loadIDS(){
       const r = await fetch(url);
       if(!r.ok) throw new Error('HTTP ' + r.status);
       const json = await r.json();
-      const rawRows = (json.ids || []).map(row => {
+      const rawRows = (json['tabla_IDS_Casma'] || json['tabla_IDS_Planta'] || json['ids'] || []).map(row => {
         const prog = parseFloat(row['PROGRAMADO'] || 0);
         const ejec = parseFloat(row['EJECUTADO']  || 0);
         // Normalizar guardia: "NO TIENE G" → "SIN GUARDIA"
@@ -1214,8 +1391,8 @@ function renderIDSGlobal(){
 
   // Desglose por unidad disponible
   const unidadesDisp = [
-    {id:'beneficio', label:'Planta Beneficio', cls:'ul-beneficio'},
     {id:'casma',     label:'Minera Casma',     cls:'ul-casma'},
+    {id:'beneficio', label:'Planta Beneficio', cls:'ul-beneficio'},
   ].filter(u => IDS_DATA[u.id]);
 
   const desglose = unidadesDisp.map(u => {
@@ -1236,11 +1413,45 @@ function renderIDSGlobal(){
     `<button class="filter-chip ${mesSel===m?'active':''}" onclick="setIDSMes(${m})">${MES_NOM[m]}</button>`
   ).join('');
 
+  // Paneles individuales por unidad
+  const unitPanels = unidadesDisp.map(u => {
+    const rows = (IDS_DATA[u.id]||[]).filter(r=>r.mes===mesSel);
+    const p = rows.reduce((s,r)=>s+r.programado,0);
+    const e = rows.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+    const pct = p>0 ? Math.round(e/p*100) : 0;
+    const noData = p===0;
+    const c = pct>=80?'#2dd4a0':pct>=50?'#f5a52a':'#f26b6b';
+    const bg = pct>=80?'rgba(45,212,160,0.07)':pct>=50?'rgba(245,165,42,0.07)':'rgba(242,107,107,0.07)';
+    const bd = pct>=80?'rgba(45,212,160,0.28)':pct>=50?'rgba(245,165,42,0.28)':'rgba(242,107,107,0.28)';
+    return `
+      <div style="flex:1;min-width:220px;background:${bg};border:1px solid ${bd};border-radius:12px;padding:14px 18px">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--tx3);margin-bottom:10px">${u.label}</div>
+        ${noData ? `<div style="font-size:13px;color:var(--tx3);text-align:center;padding:18px 0">Sin datos · ${MES_NOM[mesSel]}</div>` : `
+        <div style="display:flex;align-items:center;gap:14px">
+          <div style="display:flex;flex-direction:column;gap:2px;min-width:80px">
+            <span style="font-size:38px;font-weight:600;font-family:var(--mono);color:${c};line-height:1">${pct}%</span>
+            <span style="font-size:10px;color:var(--tx2)">${e} ejec. / ${p} prog.</span>
+          </div>
+          <div style="flex:1;min-width:120px">
+            <div style="position:relative;height:10px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:visible;margin-bottom:6px">
+              <div style="height:100%;width:${Math.min(pct,100)}%;background:${c};border-radius:5px;transition:width .6s ease"></div>
+              <div style="position:absolute;left:80%;top:-4px;width:2px;height:18px;background:rgba(245,165,42,0.7);border-radius:1px"></div>
+            </div>
+            <div style="display:flex;justify-content:space-between">
+              <span style="font-size:9px;color:var(--tx3)">0%</span>
+              <span style="font-size:9px;color:#f5a52a">Meta 80%</span>
+              <span style="font-size:9px;color:var(--tx3)">100%</span>
+            </div>
+          </div>
+        </div>`}
+      </div>`;
+  }).join('');
+
   el.innerHTML = `
-    <div style="background:${bgColor};border:1px solid ${borderColor};border-radius:12px;padding:14px 18px;margin-bottom:4px">
-      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:12px">
+    <div style="background:var(--sf3);border:1px solid var(--bd);border-radius:12px;padding:14px 18px;margin-bottom:4px">
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:14px">
         <div style="display:flex;align-items:baseline;gap:10px">
-          <span style="font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Cumplimiento global IDS</span>
+          <span style="font-size:11px;color:var(--tx2);text-transform:uppercase;letter-spacing:.06em">Cumplimiento IDS por Unidad</span>
           <span style="font-size:11px;color:var(--tx3)">· ${MES_NOM[mesSel]} ${allRows[0]?.anio||''}</span>
         </div>
         <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap">
@@ -1248,35 +1459,8 @@ function renderIDSGlobal(){
           ${mesBtns}
         </div>
       </div>
-
-      <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap">
-        <!-- Número grande -->
-        <div style="display:flex;flex-direction:column;gap:2px;min-width:100px">
-          <span style="font-size:42px;font-weight:600;font-family:var(--mono);color:${color};line-height:1">${pctGlobal}%</span>
-          <span style="font-size:11px;color:var(--tx2)">${totalEjec} ejec. / ${totalProg} prog.</span>
-        </div>
-
-        <!-- Barra de progreso grande -->
-        <div style="flex:1;min-width:180px">
-          <div style="height:10px;background:rgba(255,255,255,0.06);border-radius:5px;overflow:hidden;margin-bottom:6px">
-            <div style="height:100%;width:${pctGlobal}%;background:${color};border-radius:5px;transition:width .6s ease"></div>
-          </div>
-          <div style="display:flex;justify-content:space-between">
-            <span style="font-size:10px;color:var(--tx3)">0%</span>
-            <span style="font-size:10px;color:#f5a52a">Meta 80%</span>
-            <span style="font-size:10px;color:var(--tx3)">100%</span>
-          </div>
-          <!-- Marcador de meta -->
-          <div style="position:relative;height:6px;margin-top:-22px;pointer-events:none">
-            <div style="position:absolute;left:80%;top:-8px;width:1px;height:26px;background:rgba(245,165,42,0.5)"></div>
-          </div>
-        </div>
-
-        <!-- Desglose por unidad -->
-        ${unidadesDisp.length>1?`
-        <div style="display:flex;gap:16px;align-items:center;flex-wrap:wrap;padding-left:12px;border-left:1px solid var(--bd2)">
-          ${desglose}
-        </div>`:''}
+      <div style="display:flex;gap:12px;flex-wrap:wrap">
+        ${unitPanels}
       </div>
     </div>
   `;
@@ -1285,6 +1469,21 @@ function renderIDSGlobal(){
 function setIDSMes(mes){
   idsFilters.mes = mes;
   renderIDSGlobal();
+  // Actualizar pills con el mes seleccionado
+  const _up = [
+    {id:'casma',     label:'Casma'},
+    {id:'beneficio', label:'Beneficio'},
+  ];
+  const pillsUpd = _up.map(u => {
+    const rows = (IDS_DATA[u.id]||[]).filter(r=>r.mes===mes);
+    const p = rows.reduce((s,r)=>s+r.programado,0);
+    const e = rows.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+    const pct = p>0?Math.round(e/p*100):null;
+    if(pct===null) return '';
+    return `<span class="pill ${pillColor(pct)}" style="font-size:10px">${u.label}: ${pct}%</span>`;
+  }).join('');
+  const el = document.getElementById('pills-ids');
+  if(el) el.innerHTML = pillsUpd;
 }
 
 function renderIDSCols(){
@@ -1316,8 +1515,8 @@ function renderIDSCols(){
   }
 
   const unitsConfig = [
-    {id:'beneficio', label:'Planta Beneficio', cls:'ul-beneficio', color:'#2dd4a0'},
     {id:'casma',     label:'Minera Casma',     cls:'ul-casma',     color:'#4f8ef7'},
+    {id:'beneficio', label:'Planta Beneficio', cls:'ul-beneficio', color:'#2dd4a0'},
   ];
 
   let html = '';
@@ -1351,11 +1550,7 @@ function renderIDSCols(){
     html += `<div class="card" style="display:flex;flex-direction:column;gap:0">
       <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
         <span class="unit-lbl ${u.cls}" style="margin-bottom:0">${u.label}</span>
-        <div style="display:flex;gap:10px;align-items:center">
-          <span style="font-size:11px;color:var(--tx2)">Prog: <b style="color:var(--tx)">${totalProg}</b></span>
-          <span style="font-size:11px;color:var(--tx2)">Ejec: <b style="color:var(--tx)">${totalEjec}</b></span>
-          <span class="badge ${pctGlobal>=80?'bg':pctGlobal>=50?'ba':'br'}" style="font-size:12px;padding:3px 10px">${pctGlobal}%</span>
-        </div>
+
       </div>
       <div class="ct">Cumplimiento IDS · X: ${axX==='ÁREA'?'Área':axX==='GUARDIA'?'Guardia':axX==='mes'?'Mes':axX==='cargo'?'Cargo':'Indicador'}</div>
       <div style="position:relative;height:300px;margin-top:10px"><canvas id="${chartId}" role="img" aria-label="IDS ${u.label}"></canvas></div>
@@ -1459,14 +1654,21 @@ function renderIDSCols(){
   // Render global KPI bar
   renderIDSGlobal();
 
-  // Pills
-  const allRowsIDS = Object.values(IDS_DATA).flat().filter(Boolean);
-  const tp = allRowsIDS.reduce((s,r)=>s+r.programado,0);
-  const te = allRowsIDS.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
-  const pct = tp>0?Math.round(te/tp*100):0;
-  document.getElementById('pills-ids').innerHTML =
-    `<span class="pill ${pillColor(pct)}">${pct}% cumplimiento IDS</span>`+
-    `<span class="pill blue">${te}/${tp} inspecciones</span>`;
+  // Pills — una por unidad con su % individual del mes activo
+  const _mesPills = idsFilters.mes || null;
+  const _unitPills = [
+    {id:'casma',     label:'Casma',     cls:'ul-casma'},
+    {id:'beneficio', label:'Beneficio', cls:'ul-beneficio'},
+  ];
+  const pillsHtml = _unitPills.map(u => {
+    const rows = (IDS_DATA[u.id]||[]).filter(r => !_mesPills || r.mes===_mesPills);
+    const p = rows.reduce((s,r)=>s+r.programado,0);
+    const e = rows.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+    const pct = p>0?Math.round(e/p*100):null;
+    if(pct===null) return '';
+    return `<span class="pill ${pillColor(pct)}" style="font-size:10px">${u.label}: ${pct}%</span>`;
+  }).join('');
+  document.getElementById('pills-ids').innerHTML = pillsHtml;
 }
 
 /* ── CAPACITACIONES ── */
@@ -1541,8 +1743,8 @@ let sgFilters = { casma: null, beneficio: null };
 
 function excelToYMD(serial){
   const d = new Date(Math.round((serial - 25569) * 86400 * 1000));
-  const y = d.getUTCFullYear(), m = String(d.getUTCMonth()+1).padStart(2,'0'), dd = String(d.getUTCDate()).padStart(2,'0');
-  return `${y}-${m}-${dd}`;
+  const y = d.getUTCFullYear(), m = String(d.getUTCMonth()+1).padStart(2,'0');
+  return `${y}-${m}`;
 }
 function ymdToLabel(ymd){
   const [y,m,d] = ymd.split('-');
@@ -1560,14 +1762,44 @@ async function loadSGSSO(){
       // Formato unificado: Lineamiento / Calificación / Fecha (serial Excel)
       // Soporta claves tabla_Sistema_Casma o tabla_Sistema_Planta
       const raw = json['tabla_Sistema_Casma'] || json['tabla_Sistema_Planta'] || json['data'] || [];
+      const MES_TEXTO = {ENERO:1,FEBRERO:2,MARZO:3,ABRIL:4,MAYO:5,JUNIO:6,
+                         JULIO:7,AGOSTO:8,SEPTIEMBRE:9,OCTUBRE:10,NOVIEMBRE:11,DICIEMBRE:12};
       const seen = {};
       raw.filter(r => !String(r['Lineamiento']||'').toUpperCase().includes('PROMEDIO'))
-        .forEach(r => { seen[r['Lineamiento']+'|'+r['Fecha']] = r; });
-      SGSSO_DATA[key] = Object.values(seen).map(r => ({
-        lineamiento: String(r['Lineamiento']||'').trim(),
-        avance:      parseFloat(r['Calificación']||0),
-        fecha:       excelToYMD(r['Fecha']),
-      }));
+        .forEach(r => {
+          // Soporta tanto 'Fecha' (serial Excel) como 'MES'+'AÑO' (texto)
+          // Clave de dedup: para Fecha serial usar YYYY-MM, para MES/AÑO texto también
+          let mesKey;
+          if(r['Fecha'] && !isNaN(r['Fecha'])){
+            const _d = new Date(Math.round((parseFloat(r['Fecha'])-25569)*86400*1000));
+            mesKey = _d.getUTCFullYear()+'-'+String(_d.getUTCMonth()+1).padStart(2,'0');
+          } else {
+            const mn = {ENERO:'01',FEBRERO:'02',MARZO:'03',ABRIL:'04',MAYO:'05',JUNIO:'06',
+                        JULIO:'07',AGOSTO:'08',SEPTIEMBRE:'09',OCTUBRE:'10',NOVIEMBRE:'11',DICIEMBRE:'12'};
+            const mnum = mn[(r['MES']||'').toUpperCase().trim()] || '00';
+            mesKey = (r['AÑO']||'0000') + '-' + mnum;
+          }
+          seen[r['Lineamiento']+'|'+mesKey] = r;
+        });
+      SGSSO_DATA[key] = Object.values(seen).map(r => {
+        let fecha;
+        if(r['Fecha']){
+          fecha = excelToYMD(r['Fecha']);
+        } else {
+          const mesNum = MES_TEXTO[(r['MES']||'').toUpperCase().trim()] || 0;
+          const anio   = parseInt(r['AÑO']||0);
+          fecha = { y: anio, m: mesNum, d: 1 };
+        }
+        // Normalizar fecha a string "YYYY-MM" para comparación simple
+        const fechaKey = fecha.y && fecha.m
+          ? String(fecha.y).padStart(4,'0') + '-' + String(fecha.m).padStart(2,'0')
+          : null;
+        return {
+          lineamiento: String(r['Lineamiento']||'').trim(),
+          avance:      parseFloat(r['Calificación']||0),
+          fecha:       fechaKey,
+        };
+      });
     })
   );
   if(!SGSSO_DATA.casma)     SGSSO_DATA.casma     = SGSSO_CASMA_FALLBACK;
@@ -1766,13 +1998,20 @@ function refreshAllPills(){
     `<span class="pill blue">Incidentes: ${sumField(_ar,'incidente')}</span>`;
   // IDS pills — datos reales desde GitHub
   {
-    const allIDS = IDS_DATA.beneficio || [];
-    const tp = allIDS.reduce((s,r)=>s+r.programado,0);
-    const te = allIDS.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
-    const pct = tp>0?Math.round(te/tp*100):0;
-    document.getElementById('pills-ids').innerHTML =
-      `<span class="pill ${pillColor(pct)}">${pct}% cumplimiento IDS</span>`+
-      `<span class="pill blue">${te}/${tp} inspecciones</span>`;
+    const _unitPills2 = [
+      {id:'casma',     label:'Casma'},
+      {id:'beneficio', label:'Beneficio'},
+    ];
+    const _mesPills2 = idsFilters.mes || null;
+    const pillsHtml2 = _unitPills2.map(u => {
+      const rows2 = (IDS_DATA[u.id]||[]).filter(r => !_mesPills2 || r.mes===_mesPills2);
+      const p2 = rows2.reduce((s,r)=>s+r.programado,0);
+      const e2 = rows2.reduce((s,r)=>s+Math.min(r.ejecutado,r.programado),0);
+      const pct2 = p2>0?Math.round(e2/p2*100):null;
+      if(pct2===null) return '';
+      return `<span class="pill ${pillColor(pct2)}" style="font-size:10px">${u.label}: ${pct2}%</span>`;
+    }).join('');
+    document.getElementById('pills-ids').innerHTML = pillsHtml2;
   }
   // Cap pills — from mock data (safe access)
   try {
@@ -1814,6 +2053,96 @@ function refreshAllPills(){
 // Para desarrollo local sin GitHub, comenta loadAllData() y descomenta renderAll()
 loadAllData();
 // renderAll(); // ← usar esto para pruebas sin conexión
+
+/* ══════════════════════════════════════════
+   EXPORTAR PDF
+   ══════════════════════════════════════════ */
+async function exportarPDF(){
+  const btn = document.querySelector('.btn-pdf');
+  const origText = btn.innerHTML;
+  btn.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Preparando...';
+  btn.disabled = true;
+
+  // Elementos temporales creados para el print (a restaurar después)
+  const createdImgs = [];
+
+  try {
+    // ── 1. Aplicar filtros por sección ──
+    hhFilters.anio = 2026;
+    hhFilters.indices = ['IF','IS','IA'];
+
+    accFilters.axisX = 'mes';
+    accFilters.axisD = 'tipo';
+    accFilters.guardia = 'todas';
+    accFilters.turno = 'todos';
+
+    idsFilters.axisX = 'mes';
+    idsFilters.axisD = 'ninguno';
+    const idsMeses = [...new Set(
+      Object.values(IDS_DATA).flat().filter(Boolean).map(r=>r.mes)
+    )].sort((a,b)=>a-b);
+    if(idsMeses.length) idsFilters.mes = idsMeses[idsMeses.length-1];
+
+    ['casma','beneficio'].forEach(uid => {
+      const fechas = [...new Set((SGSSO_DATA[uid]||[]).map(r=>r.fecha).filter(Boolean))].sort();
+      if(fechas.length) sgFilters[uid] = fechas[fechas.length-1];
+    });
+
+    // ── 2. Re-renderizar todas las secciones ──
+    renderHH();
+    renderAccidentes();
+    renderIDS();
+    renderSGSSO();
+
+    // ── 3. Abrir todos los acordeones ──
+    document.querySelectorAll('.accordion').forEach(acc => {
+      const body = acc.querySelector('.acc-body');
+      const chevron = acc.querySelector('.acc-chevron');
+      if(body) body.style.maxHeight = '9999px';
+      if(chevron) chevron.style.transform = 'rotate(180deg)';
+    });
+
+    // ── 4. Esperar que Chart.js termine de renderizar ──
+    await new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r)));
+    await new Promise(r => setTimeout(r, 1200));
+
+    // ── 5. Convertir cada canvas a <img> estática (evita el blank en print) ──
+    document.querySelectorAll('canvas').forEach(canvas => {
+      try {
+        // Solo capturar canvas visibles con contenido
+        if(!canvas.offsetParent && canvas.offsetWidth === 0) return;
+        const dataUrl = canvas.toDataURL('image/png');
+        const img = document.createElement('img');
+        img.src = dataUrl;
+        // Preservar aspect ratio pero dejar que CSS de print controle el tamaño
+        const w = canvas.offsetWidth || canvas.width;
+        const h = canvas.offsetHeight || canvas.height;
+        img.setAttribute('data-aspect', (h/w).toFixed(4));
+        img.style.cssText = `display:block;width:100%;aspect-ratio:${w}/${h}`;
+        img.className = 'pdf-chart-snapshot';
+        canvas.parentNode.insertBefore(img, canvas);
+        canvas.style.display = 'none';
+        createdImgs.push({ img, canvas });
+      } catch(e){ console.warn('canvas snapshot failed', e); }
+    });
+
+    // ── 6. Pequeña pausa para que las imágenes carguen ──
+    await new Promise(r => setTimeout(r, 200));
+
+    // ── 7. Imprimir ──
+    window.print();
+
+  } finally {
+    // ── 8. Restaurar canvas y limpiar imágenes temporales ──
+    createdImgs.forEach(({img, canvas}) => {
+      canvas.style.display = '';
+      if(img.parentNode) img.parentNode.removeChild(img);
+    });
+    btn.innerHTML = origText;
+    btn.disabled = false;
+  }
+}
+
 </script>
 </body>
 </html>
